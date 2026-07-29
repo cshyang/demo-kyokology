@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { buildData, segmentCounts } from './generator.ts'
 import { latest } from './derive.ts'
-import { dynOf, extraWaves, facetsOf, k7, kband, kmag, waveSeries } from './layers.ts'
+import { dynOf, engagementFor, extraWaves, facetsOf, k7, kband, kmag, waveSeries } from './layers.ts'
 
 const data = buildData()
 const assessed = data.students.filter((st) => latest(data, st.id))
@@ -166,6 +166,35 @@ test('the Apr 2026 check-in is never a student latest record', () => {
     assert.equal(xw[id].at, '14 Apr 2026')
     assert.equal(latest(data, id), data.w2[id])
   }
+})
+
+/**
+ * The check-in's scores are nudged off October's, and a nudge is enough to cross
+ * `se < 35` or `c < 40`. Inheriting the previous label put a segment on 24% of
+ * check-in cards that the scores printed beside it contradicted.
+ */
+test('the check-in segment is computed from its own scores', () => {
+  const xw = extraWaves(data)
+  for (const id of Object.keys(xw)) {
+    assert.equal(
+      xw[id].seg,
+      data.segOf(xw[id].sc, data.byId[id]),
+      `${id}: stored segment disagrees with its own scores`,
+    )
+  }
+})
+
+/**
+ * These thresholds are shares of the cohort, so the draw behind them has to be
+ * uniform. A gaussian squashed into [0,1] is a bell centred on 0.5, against
+ * which `< 0.71` quietly stops meaning "71% of them".
+ */
+test('engagement thresholds land near the shares they name', () => {
+  const n = assessed.length
+  let opened = 0
+  for (const st of assessed) if (engagementFor(st.id, '1 Jan 2026').reportOpened) opened++
+  const share = opened / n
+  assert.ok(Math.abs(share - 0.71) < 0.05, `report-opened share ${(share * 100).toFixed(1)}%, expected ~71%`)
 })
 
 test('2024-intake students read as three assessments, in date order', () => {

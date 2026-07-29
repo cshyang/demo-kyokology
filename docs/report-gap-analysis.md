@@ -32,7 +32,7 @@ DEPTH reflection ×5             —
 —                               faculty & university norms
 ```
 
-The overlap is the six dimension names. Everything the report leads with is absent from the platform; everything the platform leads with is absent from the report. Sections 1–7 below break that down; **section 8** sorts every item by what it actually costs to build.
+The overlap is the six dimension names. Everything the report leads with is absent from the platform; everything the platform leads with is absent from the report. Sections 1–7 below break that down; **section 8** sorts every item by what it costs to build, **section 9** records what changed once it was built, and **section 10** reconciles this against the design project's own gap analysis.
 
 ---
 
@@ -149,7 +149,7 @@ Ranked by leverage. `S` = student-facing, `A` = admin/staff-facing.
 
 | # | Addition | Who | Note |
 |---|---|---|---|
-| 1 | **Facet drill-down** — 6 bars per dimension, band chip, intra-dimension spread callout | S+A | ✅ Built. 1.1 resolved by banding instead of scoring; 1.3 disclosed on the panel, not solved — see §9 |
+| 1 | **Facet drill-down** — 6 bars per dimension, band chip, intra-dimension spread callout | S+A | ✅ Built. 1.1 resolved by banding instead of scoring; 1.3 disclosed on the panel, not solved — see §9 and §10 |
 | 2 | **Pressure / Dynamic series** on the radar + per-dimension swing number | S+A | ✅ Built. The report's most distinctive idea. Platform had nothing like it |
 | 3 | **Norm rail** — percentile vs faculty and vs university on every score | S+A | ✅ Built. Data already existed. Cheapest high-value item here |
 | 4 | **Watch-outs** — rule-fired, replacing the report's per-dimension "Blind spot" | A first | ✅ Built. Renamed and rule-keyed per 1.4 and 1.10 — see §9 |
@@ -256,10 +256,10 @@ That is a constraint, not a problem. It is also what makes the phasing below pos
 
 None is a build question. All four need KYKOLOGY to answer.
 
-1. **Is the evidence real?** (§1.4) — if yes, the platform needs an evidence-capture surface and that changes the profile's information architecture. If no, the capabilities section is inference and must be labelled as such.
-2. **Does Shadow exist?** (§1.7) — if yes, it is a third data layer with its own consent model. If no, delete the footnote.
-3. **Whose facet taxonomy wins?** (§1.3, §9) — either the item bank gets rewritten to the report's 36 facet names, or the report adopts the constructs the bank actually measures. Until one happens, every facet band on Egocentricity is a label the instrument cannot support.
-4. **Is the pressure model directional or regressive?** (§9) — does Security rise for everyone under pressure, or does each profile compress toward its own centre? The two disagree for about half the cohort.
+1. **Whose facet taxonomy wins?** (§1.3, §10) — the one the design does not address. Either the item bank gets rewritten to the report's 36 facet names, or the report adopts the constructs the bank measures. Until then every facet band on Egocentricity is a label the instrument cannot support.
+2. **Is the evidence real?** (§1.4) — if yes, the platform needs an evidence-capture surface and that changes the profile's information architecture. If no, the capabilities section is inference and must be labelled as such.
+3. **Where does Shadow surface?** (§1.7, §10) — settled as canonical vocabulary by the design's `GAPS.md`, so it is measured and simply not shown. It needs its own consent model before it appears anywhere.
+4. **Do the archetypes stay?** (§10) — the report never names one, and "The Strategist" reads as a verdict in a product that insists it is not giving one.
 
 ---
 
@@ -309,17 +309,38 @@ Rewriting the item bank is out of scope for a demo, so the panel now names the m
 
 One thing also changed on the way in. Re-assessment is **not** the last stage of the post-assessment funnel, though it was planned as one: 291 students hold two assessments, which is *more* than have opened a report, because re-assessment is something the university scheduled rather than something a student chose. As a funnel stage it drew a bar longer than the ones above it and read as a bug. It sits beside the funnel instead.
 
-### An open question the PDF cannot settle
+### The pressure question, answered by the design
 
-The pressure series is implemented as regression toward the student's own centre — tall signals compress, quiet ones reach up. That reproduces NurAin's profile exactly: her Security is low and rises sharply, her Spirituality barely moves.
-
-But the report's stated *mechanism* is directional, not regressive — *"she looks for more structure and certainty in a less controlled situation."* Under a directional rule, Security rises for everyone. Under the regressive one, a student who is already high on Security sees it **fall** under pressure. S0119 is exactly that case: −11 points, and the watch-out tells staff they have less security available than the natural pattern suggests.
-
-NurAin's single profile is consistent with both theories, so the PDF cannot discriminate them. Roughly half the cohort currently gets the opposite of what a directional model would predict. **Ask KYKOLOGY which one they mean** — it is a one-line change either way, and it is a question about their model, not about this code.
+An earlier draft of this section asked whether the pressure model is directional or regressive, because NurAin's single profile is consistent with both. The design settles it, and it is neither: leading dimensions give ground, anything already low reaches up, and **Security reaches hardest** (+15 against +5 elsewhere) because structure is what people grab for when the ground moves. Spirituality is damped to a third. That is directional *and* conditional, and it is now what the platform implements.
 
 ---
 
-## 10. If only three things get done
+## 10. Reconciliation with the design project's `GAPS.md`
+
+After this analysis was written, the design project (`Kykology 6D Admin.dc.html`) turned out to hold its own gap analysis against the same two PDFs. It reaches most of the same conclusions independently. Where it goes further, it wins — it is closer to the source.
+
+**It settles two of §7's open questions:**
+
+- **Shadow is canonical** (§1.7 asked whether it exists). `GAPS.md` corrects an earlier draft of its own: *"The report states explicitly that Healthy, Shadow, and Dynamic results remain separate interpretive layers and are never averaged into one score. Shadow is canonical vocabulary. Keep it."* So the footnote is not a leftover — the layer is real and simply not shown. §1.7 stands as "measured but not rendered", not "delete the footnote".
+- **The archetype layer is the client question**, not Shadow. The report never names an archetype; it leads with "top three Behavioural Intelligences". The platform's 15 labels ("The Strategist") were invented here, and they are verdict-flavoured in a product that repeatedly insists it is *"a starting map, not a verdict."* That tension is now documented on both sides.
+
+**It supersedes three of my recommendations:**
+
+| Mine | Theirs — and why it wins |
+|---|---|
+| Cohort-percentile bands (§9) | Absolute cuts on 1–7. These are the words already printed on a student's report; a platform that bands differently contradicts the document in their hand |
+| `1 + score/100 × 6` for the scale | `score × 0.07`. The published cuts are proportions of the maximum (2.44/7 = 35%), so only the plain multiple lands a boundary where the report prints one |
+| Watch-outs keyed to percentile spread | The design's own `rangeLine` / `moversLine` / `calibLine` say the same three things in the product's voice |
+
+**It adds one thing this analysis missed entirely:** the four-pillar grouping — **Cognitive, Execution, Emotional, Relational** — sits *alongside* the six dimensions rather than being derived from them, and is what feeds contribution signals. That resolves §1.2's apparent self-contradiction: Section 3 of the report is not miscited, it is referring to a taxonomy the report never introduces. The gap is a missing definition, not a broken cross-reference.
+
+**Where this document still goes further:** §1.1 (single-item facets cannot support decimals), §1.3 (the item bank measures different constructs than the facet names), §1.8 (no response-quality signal), §1.9 (the report cannot decide who it is for), and §4.1 (the post-assessment funnel). None of these appear in `GAPS.md`.
+
+§1.3 in particular is worth holding onto, because the design ships the facet names over the same unchanged item bank and does not mention it. The built profile carries a **"Names ahead of items"** note on the four affected dimensions — Egocentricity, Complexity, Self-Actualisation and Spirituality — which is the one place this build deliberately says more than the design does.
+
+---
+
+## 11. If only three things get done
 
 1. **Fix §1.1 and §1.2.** False precision and a self-contradicting traceability chain are the two things a sceptical evaluator will find, and both undermine the report's core credibility claim.
 2. **Add the norm rail (§1.5) and the post-assessment funnel (§4.1).** Highest value per unit of work in the document — the data for both already exists in this repo.

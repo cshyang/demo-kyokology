@@ -145,19 +145,23 @@ export const LAYER_NOTE =
  * there is no shared cursor to advance, so adding a layer here can never shift
  * a draw inside buildData() and re-roll a published segment count.
  */
-function hgauss(str: string): () => number {
+function hrand(str: string): () => number {
   let h = 2166136261
   for (let i = 0; i < str.length; i++) {
     h ^= str.charCodeAt(i)
     h = Math.imul(h, 16777619)
   }
-  const r = () => {
+  return () => {
     h = (h + 0x6d2b79f5) | 0
     let t = h
     t = Math.imul(t ^ (t >>> 15), 1 | t)
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296
   }
+}
+
+function hgauss(str: string): () => number {
+  const r = hrand(str)
   return () => {
     let u = 0, v = 0
     while (!u) u = r()
@@ -204,7 +208,15 @@ export function extraWaves(data: DemoData): Record<string, WaveResult> {
     const ord = data.T.map((t, i) => ({ i, v: sc[t] })).sort((x, y) => y.v - x.v)
     const key = [ord[0].i, ord[1].i].sort((x, y) => x - y).join(',')
     const sticky = ord[1].v - ord[2].v >= 8
-    out[st.id] = { sc, arch: sticky ? data.ARCH[key] ?? prev.arch : prev.arch, seg: prev.seg, at: '14 Apr 2026' }
+    // Recomputed from the check-in's own scores, never inherited. A ±3.6 nudge
+    // is enough to cross `se < 35` or `c < 40`, so carrying October's label
+    // forward puts a segment on the card that the scores beside it contradict.
+    out[st.id] = {
+      sc,
+      arch: sticky ? data.ARCH[key] ?? prev.arch : prev.arch,
+      seg: data.segOf(sc, st),
+      at: '14 Apr 2026',
+    }
   }
   return out
 }
@@ -378,8 +390,10 @@ export interface Engagement {
  * reason the funnel is worth showing at all.
  */
 export function engagementFor(studentId: string, completedAt: string): Engagement {
-  const g = hgauss(studentId + '|engagement')
-  const u = () => Math.min(0.999, Math.max(0, g() * 0.28 + 0.5))
+  // A real uniform, not a gaussian squashed into [0,1] — every threshold below
+  // is a share of the cohort, and against a bell centred on 0.5 `< 0.71` stops
+  // meaning "71% of them".
+  const u = hrand(studentId + '|engagement')
   const opened = u() < 0.71
   const depthDone = !opened ? 0 : u() < 0.52 ? 0 : 1 + Math.floor(u() * 5)
   const planStarted = depthDone >= 3 && u() < 0.64
@@ -401,8 +415,7 @@ export interface ResponseQuality {
  * considered one.
  */
 export function responseQualityFor(studentId: string): ResponseQuality {
-  const g = hgauss(studentId + '|quality')
-  const u = () => Math.min(0.999, Math.max(0, g() * 0.28 + 0.5))
+  const u = hrand(studentId + '|quality')
   const minutes = Math.round((4 + u() * 11) * 10) / 10
   const longestRun = 2 + Math.floor(u() * (u() < 0.12 ? 9 : 4))
   const skipped = u() < 0.08 ? 1 + Math.floor(u() * 2) : 0

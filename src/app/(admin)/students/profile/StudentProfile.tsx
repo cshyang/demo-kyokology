@@ -142,7 +142,7 @@ export function StudentProfile({ id }: { id: string }) {
         </div>
         <BlueprintLegend />
 
-        <FacetPanel fdim={v.fdim} assessedN={v.assessedN} />
+        <FacetPanel fdim={v.fdim} dim={data.T[sdim]} assessedN={v.assessedN} />
 
         <Heading>Calibration</Heading>
         <Prose>{v.calibLine}</Prose>

@@ -4,6 +4,7 @@ import {
   DEPTH_STAGES, LAYER_NOTE, MAG_LEGEND, PLAN_WEEKS,
   type Engagement, type Facet, type ResponseQuality, type TraitView,
 } from '@/lib/data/layers.ts'
+import type { Dim } from '@/lib/data/generator.ts'
 
 /**
  * A section heading, in the serif at 17px over a hairline rule.
@@ -91,14 +92,32 @@ export function BlueprintLegend() {
   )
 }
 
+/**
+ * Where the facet names and the item bank do not yet describe the same thing.
+ *
+ * The names are the report's taxonomy; the scores under them come from this
+ * platform's 36 items, and on these four dimensions the two were written against
+ * different constructs. The design does not mention it, but a band is a claim
+ * about a named person, and a reader is entitled to know which of these claims
+ * the instrument can currently support.
+ * See docs/report-gap-analysis.md §1.3.
+ */
+const UNMAPPED: Partial<Record<Dim, string>> = {
+  e: 'The report reads Egocentricity as agency — persistence, authority, taking charge. This platform’s six items read it as grievance: keeping score, letting a slight go, sitting with criticism.',
+  c: 'No item in the bank asks about persuasion, so Inspiring & Influencing is carried by items about ambiguity and pattern-finding.',
+  sa: 'No item asks about ethics or formal reasoning; those two facets ride on the rest of the dimension.',
+  sp: 'The bank is deliberately secular. Faith & Higher Power and Meaning, Existence & Afterlife have no item behind them.',
+}
+
 /** The selected dimension opened out: six facets strongest first, then the blind spot. */
 export function FacetPanel({
-  fdim, assessedN,
+  fdim, dim, assessedN,
 }: {
   fdim: {
     label: string; desc: string; v7: string; mag: string; magC: string
     spread: string; facets: Facet[]; blindSpot: string
   }
+  dim: Dim
   assessedN: number
 }) {
   return (
@@ -139,6 +158,13 @@ export function FacetPanel({
         <div className="font-mono text-[8.5px] leading-none font-bold tracking-[.13em] text-[#8A6A1F]">BLIND SPOT</div>
         <p className="mt-2.5 text-[13px] leading-[1.65] text-pretty text-ink/82">{fdim.blindSpot}</p>
       </div>
+
+      {UNMAPPED[dim] ? (
+        <p className="mt-3 border-l-2 border-ink/14 pl-3.5 text-[11.5px] leading-[1.65] text-pretty text-ink/55">
+          <strong className="font-bold text-ink/75">Names ahead of items.</strong> {UNMAPPED[dim]} These bands are
+          provisional until the item bank is written to match the facet names.
+        </p>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-4">
         {MAG_LEGEND.map((m) => (
