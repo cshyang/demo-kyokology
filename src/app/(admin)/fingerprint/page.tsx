@@ -44,7 +44,7 @@ export default function FingerprintPage() {
     const facMeans = data.FACULTIES.map((f) =>
       meanOf(data, acrossFaculties.filter((r) => r.st.faculty === f.name)),
     )
-    const refShort = filter.wave === 'latest' ? 'uni' : `uni Oct ${filter.wave === 'w1' ? '25' : '26'}`
+    const refShort = filter.wave === 'latest' ? 'campus' : `campus Oct ${filter.wave === 'w1' ? '25' : '26'}`
 
     const axes = data.SHORT.map((label, i) => {
       const a = ((-90 + i * 60) * Math.PI) / 180
@@ -94,10 +94,10 @@ export default function FingerprintPage() {
         `the widest gap is ${wd} points, on ${data.LABELS[wi]}, between ${ranked[0].name} (${ranked[0].v}) ` +
         `and ${ranked[3].name} (${ranked[3].v}). The commonest reading is ${archRows[0]?.name ?? '—'}, ` +
         `${archRows[0]?.n ?? 0} students.`,
-      refLabel: filter.wave === 'latest' ? 'University' : `University · ${WAVE_NAME[filter.wave]}`,
+      refLabel: filter.wave === 'latest' ? 'Campus' : `Campus · ${WAVE_NAME[filter.wave]}`,
       caption: isAll
         ? 'Each axis shows the cohort mean and the spread across the four faculties.'
-        : `Each axis shows ${filter.fac} against the ${filter.wave === 'latest' ? 'university mean' : `university, ${WAVE_NAME[filter.wave]}`}.`,
+        : `Each axis shows ${filter.fac} against the ${filter.wave === 'latest' ? 'campus mean' : `campus, ${WAVE_NAME[filter.wave]}`}.`,
       cohFill: isAll ? tint('ink', 7) : tint('teal', 16),
       cohStroke: isAll ? token('ink') : token('teal'),
     }
@@ -105,7 +105,7 @@ export default function FingerprintPage() {
 
   /*
    * Every series on the radar tweens as one moment: the cohort shape, the
-   * university reference behind it and the four faculty outlines all belong to
+   * campus reference behind it and the four faculty outlines all belong to
    * the same filter change, so they travel on a single clock. Splitting them
    * into five hooks would put five requestAnimationFrame loops on the same
    * subtree, each re-rendering it independently.
@@ -129,7 +129,7 @@ export default function FingerprintPage() {
         sub={
           filter.fac === 'All'
             ? `Six dimensions across ${v.recs.length} assessed students, with each faculty overlaid.`
-            : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the university-wide average.`
+            : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the campus-wide average.`
         }
         /*
          * Clearing the hover alongside the filter, because picking "Engineering"

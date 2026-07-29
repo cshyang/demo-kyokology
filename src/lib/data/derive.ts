@@ -242,7 +242,7 @@ export interface Checkpoint {
 
 /**
  * Five October checkpoints. 2022–2024 are fixed history — the demo asserts the
- * university ran the instrument before this deployment; 2025 and 2026 are
+ * campus ran the instrument before this deployment; 2025 and 2026 are
  * computed from the generated waves.
  */
 export function checkpoints(data: DemoData): Checkpoint[] {

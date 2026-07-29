@@ -330,7 +330,7 @@ function StudentLink() {
           <div className="min-h-0 flex-1 overflow-auto rounded-[9px] bg-cream p-[18px_20px]">
             <div className="eyebrow text-[9px] tracking-[.16em] text-ink/45">WHAT THE STUDENT AGREES TO</div>
             <p className="mt-[13px] text-[12.5px] leading-[1.8] text-ink/70">
-              Results are shared with Kykology University so support and opportunities can be pointed at the right
+              Results are shared with KYKOLOGY Campus so support and opportunities can be pointed at the right
               people. The student sees their own profile the moment they finish. Declining is recorded as declined —
               they are not chased.
             </p>

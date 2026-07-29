@@ -620,7 +620,7 @@ export function profileLayers(
     (seg.id === 'steady'
       ? 'All six dimensions sit in the healthy middle band: nothing here calls for action.'
       : segAction
-        ? `They currently match ${seg.name}, which the university attaches to ${segAction}.`
+        ? `They currently match ${seg.name}, which the campus attaches to ${segAction}.`
         : 'No flagged pattern matched, which is the ordinary result and the reason the flagged ones are worth reading.')
 
   const archMove = !prevW
@@ -641,7 +641,7 @@ export function profileLayers(
     consentNote: n === 1 ? 'One consent on record.' : `${n} consents on record, one per assessment.`,
     consentRows: series.map((w) => ({
       date: w.date,
-      scope: 'Results shared with Kykology University · student sees their own profile',
+      scope: 'Results shared with KYKOLOGY Campus · student sees their own profile',
     })),
     comms: campaigns
       .filter((c) => c.list.indexOf(st) >= 0)

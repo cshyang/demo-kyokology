@@ -179,7 +179,7 @@ export function FacetPanel({
 
       <p className="mt-[11px] text-[11px] leading-[1.65] text-pretty text-ink/48">{LAYER_NOTE}</p>
       <p className="mt-3 text-[11px] leading-[1.6] text-ink/45">
-        Change is shown against the previous assessment, on the same 1–7 scale. The grey tick is the university
+        Change is shown against the previous assessment, on the same 1–7 scale. The grey tick is the campus
         mean of {assessedN} assessed students.
       </p>
     </>

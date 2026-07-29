@@ -112,7 +112,7 @@ export default function OverviewPage() {
    *
    * Re-assessment is deliberately NOT in this list. 291 students hold two
    * completed assessments, which is more than have opened their report — because
-   * being re-assessed is something the university did to them, not something
+   * being re-assessed is something the campus did to them, not something
    * they chose after reading anything. Putting it at the bottom of a funnel
    * makes the last bar longer than the ones above it and reads as a bug. It sits
    * beside the funnel instead, which is also where it belongs conceptually.
@@ -133,7 +133,7 @@ export default function OverviewPage() {
 
   return (
     <>
-      <Header title="Overview" sub="Kykology University · 6D Profile deployment · as of 2 November 2026">
+      <Header title="Overview" sub="KYKOLOGY™ Campus · 6D Profile deployment · as of 2 November 2026">
         {/* Invite someone now lives in Header — it is on every screen, not just this one. */}
         <HeaderButton tone="solid" onClick={() => router.push('/campaigns/new')}>New campaign</HeaderButton>
       </Header>
@@ -229,7 +229,7 @@ export default function OverviewPage() {
               <p className="mt-3.5 border-t border-ink/8 pt-3 text-[11px] leading-[1.55] text-ink/50">
                 Separately, <strong className="font-bold text-ink">{v.post.reassessed}</strong> students hold two
                 completed assessments — more than have opened a report, because re-assessment is something the
-                university scheduled rather than something a student chose. It is the population Longitudinal
+                campus scheduled rather than something a student chose. It is the population Longitudinal
                 is built on.
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function OverviewPage() {
 
             <Panel>
               <div className="flex items-baseline">
-                <CardTitle>University fingerprint</CardTitle>
+                <CardTitle>Campus fingerprint</CardTitle>
                 <span className="ml-auto"><MoreLink href="/longitudinal">Explore →</MoreLink></span>
               </div>
               <p className="mt-1.5 text-[11px] leading-[1.4] text-ink/50">
