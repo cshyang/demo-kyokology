@@ -77,6 +77,16 @@ export function CampaignDetail({ id }: { id: string }) {
 
   const GRID = '[grid-template-columns:120px_150px_70px_1fr_120px]'
   const reminder = templates.reminder
+  // Same substitution the Templates screen previews with, against a real student.
+  const sample = campaign.list.find((st) => st[campaign.key] === 'sent') ?? campaign.list[0]
+  const resolve = (text: string) =>
+    text
+      .split('{{student_name}}')
+      .join(sample.name)
+      .split('{{test_name}}')
+      .join('the KYKOLOGY 6D Profile')
+      .split('{{deadline}}')
+      .join('7 November 2026')
 
   return (
     <>
@@ -137,16 +147,23 @@ export function CampaignDetail({ id }: { id: string }) {
                 Send reminder
               </button>
             </div>
-            <div className="bg-white p-[16px_18px]">
-              <div className="eyebrow text-[9px] tracking-[.14em] text-ink/45">SUBJECT</div>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] font-bold text-ink">{reminder.subject}</p>
-              <div className="eyebrow mt-3.5 text-[9px] tracking-[.14em] text-ink/45">BODY</div>
-              <p className="mt-1.5 max-w-[70ch] text-[12.5px] leading-[1.7] whitespace-pre-line text-ink/70">
-                {reminder.body}
-              </p>
-              <Link href="/templates" className="mt-3.5 inline-block text-[11.5px] leading-none font-bold text-teal hover:underline">
-                Edit this template →
-              </Link>
+            <div className="grid gap-[18px] bg-white p-[16px_18px] md:grid-cols-2">
+              <div>
+                <div className="eyebrow mb-2.5 text-[9px] tracking-[.16em] text-ink/45">TEMPLATE</div>
+                <p className="text-[13px] leading-[1.4] font-bold text-ink">{reminder.subject}</p>
+                <p className="mt-2.5 text-[12px] leading-[1.7] whitespace-pre-wrap text-ink/70">{reminder.body}</p>
+                <Link href="/templates" className="mt-3.5 inline-block text-[11.5px] leading-none font-bold text-teal hover:underline">
+                  Edit this template →
+                </Link>
+              </div>
+              {/* Tokens resolved against a real recipient — the tokens alone do not read as an email. */}
+              <div className="rounded-[8px] bg-cream p-[15px_17px]">
+                <div className="eyebrow mb-2.5 text-[9px] tracking-[.16em] text-ink/45">PREVIEW · {sample.name}</div>
+                <p className="text-[13px] leading-[1.4] font-bold text-ink">{resolve(reminder.subject)}</p>
+                <p className="mt-2.5 text-[12px] leading-[1.7] whitespace-pre-wrap text-ink/70">
+                  {resolve(reminder.body)}
+                </p>
+              </div>
             </div>
           </section>
         )}

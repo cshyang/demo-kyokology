@@ -62,6 +62,7 @@ function Assessment() {
    */
   const status = params.get('status') ?? 'sent'
   const seeded = useMemo(() => {
+    if (status === 'bounced') return { stage: 'bounced' as const, page: 0, answers: {} }
     if (status !== 'started' && status !== 'completed') return { stage: 'welcome' as const, page: 0, answers: {} }
     const rec = data.w3[student.id] ?? data.w2[student.id] ?? data.w1[student.id]
     if (!rec) return { stage: 'welcome' as const, page: 0, answers: {} }
@@ -88,7 +89,7 @@ function Assessment() {
     return { stage: status === 'completed' ? ('done' as const) : ('questions' as const), page: status === 'completed' ? 0 : 4, answers }
   }, [status, student.id, data])
 
-  const [stage, setStage] = useState<'welcome' | 'questions' | 'done'>(seeded.stage)
+  const [stage, setStage] = useState<'welcome' | 'questions' | 'done' | 'bounced'>(seeded.stage)
   const [consent, setConsent] = useState(seeded.stage !== 'welcome')
   const [page, setPage] = useState(seeded.page)
   const [answers, setAnswers] = useState<Record<number, number>>(seeded.answers)
@@ -113,6 +114,21 @@ function Assessment() {
       v: sum[d].n ? Math.round(((sum[d].total / sum[d].n - 1) / 4) * 100) : 0,
     }))
   }, [answers, data.T])
+
+  if (stage === 'bounced') {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center px-[26px] py-2 text-center">
+        <div className="font-mono text-[10px] leading-none font-semibold tracking-[.14em] text-rust">NOT DELIVERED</div>
+        <h1 className="mt-3.5 font-display text-[22px] leading-[1.3] font-semibold text-ink">
+          This link never arrived
+        </h1>
+        <p className="mt-3 text-[13.5px] leading-[1.7] text-ink/65">
+          The invite bounced, so nothing was ever opened. Fix the address on their record and resend from the
+          campaign.
+        </p>
+      </div>
+    )
+  }
 
   if (stage === 'welcome') {
     return (
