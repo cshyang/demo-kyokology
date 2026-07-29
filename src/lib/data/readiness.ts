@@ -1,3 +1,4 @@
+import { token } from '../color.ts'
 import { DIMS, type DemoData, type Dim } from './generator.ts'
 import { recordFor, waffleCells, type Wave } from './derive.ts'
 import { dynOf, extraWaves, facetsOf, k7s, kband, MAG_LEGEND, waveSeries } from './layers.ts'
@@ -151,10 +152,10 @@ export function readinessOf(data: DemoData, wave: Wave): ReadinessRow[] {
  * dynamic range as developmental, so no band is coloured as a failure.
  */
 export const SWING_BANDS = [
-  { name: 'STEADY', lo: 0, hi: 8, color: '#8A8F94' },
-  { name: 'SHIFTS', lo: 8, hi: 13, color: '#6E96BF' },
-  { name: 'WIDE', lo: 13, hi: 18, color: '#B98B3C' },
-  { name: 'VOLATILE', lo: 18, hi: Infinity, color: '#A6503F' },
+  { name: 'STEADY', lo: 0, hi: 8, color: token('stone') },
+  { name: 'SHIFTS', lo: 8, hi: 13, color: token('sky') },
+  { name: 'WIDE', lo: 13, hi: 18, color: token('gold') },
+  { name: 'VOLATILE', lo: 18, hi: Infinity, color: token('rust') },
 ] as const
 
 export const NOT_MEASURABLE = 'NOT YET MEASURABLE'
