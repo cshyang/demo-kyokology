@@ -191,7 +191,9 @@ export function CampaignDetail({ id }: { id: string }) {
               <div key={h} className="eyebrow text-[8.5px] tracking-[.1em] text-ink/42">{h}</div>
             ))}
           </div>
-          <div className="min-h-0 flex-1 overflow-auto">
+          {/* Same as the segment roster: the chip filters swap the rows, so the
+              rows should visibly change rather than silently substitute. */}
+          <div key={filter} className="chart-appear min-h-0 flex-1 overflow-auto">
             {rows.map(({ st, status }) => {
               const pct = status === 'completed' ? 100 : status === 'started' ? 45 : status === 'opened' ? 8 : 0
               const tone = STATUS_COLOR[status]
