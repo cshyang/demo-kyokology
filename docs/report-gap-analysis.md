@@ -168,19 +168,21 @@ Item 10 deserves emphasis. Everything else on the profile is static between asse
 
 ## 3. Insights tabs
 
-Current: Fingerprint · Segments · Longitudinal.
+Current: Fingerprint · Segments · **Readiness** · Longitudinal.
 
-### 3.1 New: Pressure
+### 3.1 Pressure — ✅ shipped as a tile, not a tab
 
-Which dimensions swing most under pressure, cohort-wide, split by faculty and intake. **No counterpart today.**
+Which dimensions swing most under pressure, cohort-wide. Now the fifth tile on `/readiness`: each student's widest absolute swing, banded STEADY / SHIFTS / WIDE / VOLATILE. Measured 15 / 45 / 24 / 16 — the best-spread read on that page and the only one not squashed by facet averaging.
 
-This is the strongest new insight surface because it is the only one that predicts *when* students struggle rather than *who* is struggling. "Second-year Science students' Security rises 14 points under pressure, concentrated in the four weeks before finals" is an operational sentence — it tells a Dean when to staff up.
+Still not built: the *dimension-level* breakdown that would produce "Science Year 2's Security rises 14 points under pressure". The tile answers how widely students move, not which dimension they move toward. That remains the strongest unbuilt insight surface, because it is the only one that predicts *when* students struggle rather than *who* is struggling.
 
-### 3.2 New: Capabilities
+### 3.2 Capabilities — ✅ superseded by Readiness
 
-Heatmap of 22 families × cohort, band distribution per family.
+Originally proposed as a heatmap of 22 capability families. Shipped instead as `/readiness`: five educator reads over facets `layers.ts` already computes, per `docs/superpowers/specs/2026-07-30-readiness-page-design.md`.
 
-*"Leadership & Mobilisation is EMERGING for 68% of Year 2"* is the sentence a Dean pays for. This tab is employability-facing, which makes it the one that justifies licence renewal to a budget holder who doesn't care about psychometrics.
+*"Leadership potential is DEVELOPING or below for 81% of the 2026 intake"* is the sentence a Dean pays for, and the page produces it. This surface is employability-facing, which makes it the one that justifies licence renewal to a budget holder who doesn't care about psychometrics.
+
+Two things it does **not** solve, both disclosed on-screen rather than hidden: §1.3's facet-taxonomy problem rides along wholesale, and Team compatibility correlates 0.98 with Sociocentricity because it honestly is sociocentricity.
 
 ### 3.3 New: Contribution
 

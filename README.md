@@ -48,6 +48,7 @@ while the code still looks correct.
 | `/overview` | KPIs, five October checkpoints, the post-assessment funnel, fingerprint bars, activity, population waffle |
 | `/fingerprint` | Six-axis radar, faculty separation, archetype distribution |
 | `/segments` | **The hero.** Six flagged patterns with attached actions, plus the roster |
+| `/readiness` | The educator view — five cohort reads (leadership, team, resilience, workplace, pressure) as band distributions |
 | `/longitudinal` | Dimension movement, the "22 of 55 moved out" headline, pattern migration |
 | `/students/profile?id=` | The individual profile — facets, bands, pressure, watch-outs, reflection state, calibration scatter. Reached from People |
 | `/campaigns` · `/campaigns/[id]` | Funnel tracking and the nudge flow |
@@ -62,6 +63,7 @@ while the code still looks correct.
  src/lib/data/generator.ts   seeded generator — DO NOT REFACTOR
  src/lib/data/derive.ts      aggregates: funnels, migration, waffle, radar inputs
  src/lib/data/layers.ts      facets, bands, pressure, watch-outs, engagement — all downstream
+ src/lib/data/readiness.ts   five educator reads over the facet layer — cohort-level, pure
  src/lib/data/questions.ts   the 36-item bank, 6 per dimension
  src/lib/demo-state.tsx      React context — every mutation the demo allows
  src/app/(admin)/            every screen, including the student link at /t
