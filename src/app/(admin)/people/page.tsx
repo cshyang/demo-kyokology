@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Header, HeaderButton } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { useDemoState, type NewPerson } from '@/lib/demo-state'
+import { tint } from '@/lib/color'
 
 const SAMPLE = `alex.tan@kykology.edu, Alex Tan, Engineering, 2026
 priya.nair@kykology.edu, Priya Nair, Health, 2026
@@ -251,7 +252,7 @@ export default function PeoplePage() {
               const assessment = isNew
                 ? { text: 'NO BASELINE', color: 'var(--color-gold)' }
                 : n
-                  ? { text: `ASSESSED ${n}\u00d7 \u00b7 LAST ${last!.at.toUpperCase()}`, color: 'rgba(20,40,60,.55)' }
+                  ? { text: `ASSESSED ${n}\u00d7 \u00b7 LAST ${last!.at.toUpperCase()}`, color: tint('ink', 55) }
                   : { text: 'NEVER ASSESSED', color: 'var(--color-rust)' }
 
               return (

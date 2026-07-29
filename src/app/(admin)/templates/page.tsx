@@ -46,7 +46,7 @@ export default function TemplatesPage() {
                 key={k.id}
                 onClick={() => setKind(k.id)}
                 className={`cursor-pointer rounded-[20px] px-[15px] py-2.5 text-[11.5px] leading-none font-bold ${
-                  kind === k.id ? 'bg-ink text-white' : 'bg-white text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.16)]'
+                  kind === k.id ? 'bg-ink text-white' : 'bg-white text-ink inset-ring inset-ring-ink/16'
                 }`}
               >
                 {k.label}

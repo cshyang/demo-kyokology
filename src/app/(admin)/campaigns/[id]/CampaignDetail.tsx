@@ -8,13 +8,14 @@ import { useDemoData } from '@/lib/data/demo.ts'
 import { campaignFunnel } from '@/lib/data/derive.ts'
 import { useDemoState } from '@/lib/demo-state'
 import type { SendStatus } from '@/lib/data/generator.ts'
+import { tint, token } from '@/lib/color'
 
 const STATUS_COLOR: Record<SendStatus, { color: string; tint: string }> = {
-  completed: { color: '#5E8F80', tint: 'rgba(94,143,128,.14)' },
-  started: { color: '#B98B3C', tint: 'rgba(185,139,60,.14)' },
-  opened: { color: '#14283C', tint: 'rgba(20,40,60,.07)' },
-  sent: { color: '#8A8F94', tint: 'rgba(20,40,60,.05)' },
-  bounced: { color: '#A6503F', tint: 'rgba(166,80,63,.12)' },
+  completed: { color: token('sage'), tint: tint('sage', 14) },
+  started: { color: token('gold'), tint: tint('gold', 14) },
+  opened: { color: token('ink'), tint: tint('ink', 7) },
+  sent: { color: token('stone'), tint: tint('ink', 5) },
+  bounced: { color: token('rust'), tint: tint('rust', 12) },
 }
 
 type Filter = 'all' | 'noprogress' | SendStatus
@@ -39,11 +40,11 @@ export function CampaignDetail({ id }: { id: string }) {
     return {
       f,
       steps: [
-        { label: 'SENT', n: f.sent, pct: 100, color: '#14283C', bg: '#fff' },
-        { label: 'OPENED', n: f.opened, pct: pct(f.opened), color: '#14283C', bg: '#fff' },
-        { label: 'STARTED', n: f.started, pct: pct(f.started), color: '#B98B3C', bg: '#fff' },
-        { label: 'COMPLETED', n: f.completed, pct: pct(f.completed), color: '#5E8F80', bg: '#F5F8F6' },
-        { label: 'BOUNCED', n: f.bounced, pct: pct(f.bounced), color: '#A6503F', bg: '#FBF6F4' },
+        { label: 'SENT', n: f.sent, pct: 100, color: token('ink'), bg: '#fff' },
+        { label: 'OPENED', n: f.opened, pct: pct(f.opened), color: token('ink'), bg: '#fff' },
+        { label: 'STARTED', n: f.started, pct: pct(f.started), color: token('gold'), bg: '#fff' },
+        { label: 'COMPLETED', n: f.completed, pct: pct(f.completed), color: token('sage'), bg: '#F5F8F6' },
+        { label: 'BOUNCED', n: f.bounced, pct: pct(f.bounced), color: token('rust'), bg: '#FBF6F4' },
       ],
       // "No progress" = delivered but never started. This is the set the reminder rule targets.
       noProgress: campaign.list.filter((st) => st[campaign.key] === 'sent' || st[campaign.key] === 'opened').length,

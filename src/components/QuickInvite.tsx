@@ -49,7 +49,7 @@ export function QuickInvite() {
     <>
       <button
         onClick={() => openInvite()}
-        className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.18)] hover:bg-cream"
+        className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink inset-ring inset-ring-ink/18 hover:bg-cream"
       >
         Invite someone
       </button>
@@ -61,7 +61,7 @@ export function QuickInvite() {
           role="presentation"
         >
           <div
-            className="panel-in w-[520px] overflow-hidden rounded-xl bg-white shadow-[0_24px_60px_rgba(20,40,60,.32)]"
+            className="panel-in w-[520px] overflow-hidden rounded-xl bg-white shadow-[0_24px_60px] shadow-ink/32"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-ink/8 px-6 py-5">
@@ -94,7 +94,7 @@ export function QuickInvite() {
                     className={`cursor-pointer rounded-md px-[13px] py-2.5 text-[11.5px] leading-none font-bold ${
                       t === test
                         ? 'bg-ink text-white'
-                        : 'bg-white text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.16)]'
+                        : 'bg-white text-ink inset-ring inset-ring-ink/16'
                     }`}
                   >
                     {t}
@@ -106,7 +106,7 @@ export function QuickInvite() {
             <div className="flex items-center gap-3 border-t border-ink/8 bg-cream px-6 py-4">
               <button
                 onClick={closeInvite}
-                className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.18)]"
+                className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink inset-ring inset-ring-ink/18"
               >
                 Cancel
               </button>
@@ -127,7 +127,7 @@ export function QuickInvite() {
       {toast && (
         <div
           onClick={() => setToast('')}
-          className="toast-in fixed bottom-[26px] left-1/2 z-90 flex -translate-x-1/2 cursor-pointer items-center gap-3 rounded-lg bg-ink px-[18px] py-[13px] text-white shadow-[0_6px_20px_rgba(20,40,60,.24)]"
+          className="toast-in fixed bottom-[26px] left-1/2 z-90 flex -translate-x-1/2 cursor-pointer items-center gap-3 rounded-lg bg-ink px-[18px] py-[13px] text-white shadow-[0_6px_20px] shadow-ink/24"
         >
           <span className="size-[7px] rounded-full bg-brass" />
           <span className="text-[12.5px] leading-none">{toast}</span>

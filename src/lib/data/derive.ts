@@ -1,4 +1,5 @@
 import type { Campaign, DemoData, Dim, SegmentId, Student } from './generator.ts'
+import { token } from '../color.ts'
 
 /**
  * Funnel counts for one campaign.
@@ -114,7 +115,7 @@ export function movers(data: DemoData): Mover[] {
         name: `${f.name} · ${data.LABELS[i]}`,
         d,
         txt: (d > 0 ? '+' : '') + d.toFixed(1),
-        color: d >= 0 ? '#5E8F80' : '#A6503F',
+        color: d >= 0 ? token('sage') : token('rust'),
       })
     })
   }
@@ -135,7 +136,7 @@ function centredBar(d: number, span: number): CentredBar {
   const mag = Math.min(Math.abs(d) / 8, 1) * span
   return {
     txt: (d > 0 ? '+' : '') + d.toFixed(1),
-    color: d >= 0 ? '#5E8F80' : '#A6503F',
+    color: d >= 0 ? token('sage') : token('rust'),
     w: +mag.toFixed(1),
     l: d >= 0 ? 50 : +(50 - mag).toFixed(1),
   }
@@ -241,7 +242,7 @@ export interface Checkpoint {
 
 /**
  * Five October checkpoints. 2022–2024 are fixed history — the demo asserts the
- * university ran the instrument before this deployment; 2025 and 2026 are
+ * campus ran the instrument before this deployment; 2025 and 2026 are
  * computed from the generated waves.
  */
 export function checkpoints(data: DemoData): Checkpoint[] {

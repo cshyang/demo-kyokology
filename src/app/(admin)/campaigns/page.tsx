@@ -7,6 +7,7 @@ import { Header } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { campaignFunnel } from '@/lib/data/derive.ts'
 import { useDemoState } from '@/lib/demo-state'
+import { tint, token } from '@/lib/color'
 
 function CreatedBanner() {
   const created = useSearchParams().get('created')
@@ -118,7 +119,7 @@ export default function CampaignsPage() {
               </div>
               <div
                 className="eyebrow rounded-[4px] p-[6px_9px] text-center text-[9.5px] tracking-[.1em] font-semibold"
-                style={{ color: '#B98B3C', background: 'rgba(185,139,60,.16)' }}
+                style={{ color: token('gold'), background: tint('gold', 16) }}
               >
                 IN FLIGHT
               </div>
@@ -148,8 +149,8 @@ export default function CampaignsPage() {
                 className="eyebrow rounded-[4px] p-[6px_9px] text-center text-[9.5px] tracking-[.1em] font-semibold"
                 style={
                   c.status === 'COMPLETE'
-                    ? { color: '#5E8F80', background: 'rgba(94,143,128,.14)' }
-                    : { color: '#B98B3C', background: 'rgba(185,139,60,.16)' }
+                    ? { color: token('sage'), background: tint('sage', 14) }
+                    : { color: token('gold'), background: tint('gold', 16) }
                 }
               >
                 {c.status}

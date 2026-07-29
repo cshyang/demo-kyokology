@@ -6,10 +6,11 @@ import { CohortFilters } from '@/components/CohortFilters'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { useTweenedNumbers } from '@/lib/use-tweened-numbers.ts'
 import { meanOf, recordFor, selectRecords, type CohortFilter } from '@/lib/data/derive.ts'
+import { tint, token } from '@/lib/color'
 
 // Radar geometry, verbatim from the prototype so the shape is identical.
 const CX = 238, CY = 204, R = 118, VB_W = 476, VB_H = 404
-const FACULTY_COLORS = ['#1E6F63', '#B98B3C', '#6E96BF', '#A6503F']
+const FACULTY_COLORS = [token('teal'), token('gold'), token('sky'), token('rust')]
 const WAVE_NAME = { w1: 'first assessment', w2: 're-assessment', latest: 'latest' } as const
 
 const point = (i: number, v: number): [number, number] => {
@@ -43,7 +44,7 @@ export default function FingerprintPage() {
     const facMeans = data.FACULTIES.map((f) =>
       meanOf(data, acrossFaculties.filter((r) => r.st.faculty === f.name)),
     )
-    const refShort = filter.wave === 'latest' ? 'uni' : `uni Oct ${filter.wave === 'w1' ? '25' : '26'}`
+    const refShort = filter.wave === 'latest' ? 'campus' : `campus Oct ${filter.wave === 'w1' ? '25' : '26'}`
 
     const axes = data.SHORT.map((label, i) => {
       const a = ((-90 + i * 60) * Math.PI) / 180
@@ -65,7 +66,7 @@ export default function FingerprintPage() {
         sub: isAll
           ? `${lo}–${hi} by faculty`
           : d === 0 ? '' : `${d > 0 ? '+' : ''}${d} vs ${refShort}`,
-        subcol: isAll ? 'rgba(20,40,60,.42)' : d > 2 ? '#1E6F63' : d < -2 ? '#A6503F' : 'rgba(20,40,60,.4)',
+        subcol: isAll ? tint('ink', 42) : d > 2 ? token('teal') : d < -2 ? token('rust') : tint('ink', 40),
       }
     })
 
@@ -93,18 +94,18 @@ export default function FingerprintPage() {
         `the widest gap is ${wd} points, on ${data.LABELS[wi]}, between ${ranked[0].name} (${ranked[0].v}) ` +
         `and ${ranked[3].name} (${ranked[3].v}). The commonest reading is ${archRows[0]?.name ?? '—'}, ` +
         `${archRows[0]?.n ?? 0} students.`,
-      refLabel: filter.wave === 'latest' ? 'University' : `University · ${WAVE_NAME[filter.wave]}`,
+      refLabel: filter.wave === 'latest' ? 'Campus' : `Campus · ${WAVE_NAME[filter.wave]}`,
       caption: isAll
         ? 'Each axis shows the cohort mean and the spread across the four faculties.'
-        : `Each axis shows ${filter.fac} against the ${filter.wave === 'latest' ? 'university mean' : `university, ${WAVE_NAME[filter.wave]}`}.`,
-      cohFill: isAll ? 'rgba(20,40,60,.07)' : 'rgba(30,111,99,.16)',
-      cohStroke: isAll ? '#14283C' : '#1E6F63',
+        : `Each axis shows ${filter.fac} against the ${filter.wave === 'latest' ? 'campus mean' : `campus, ${WAVE_NAME[filter.wave]}`}.`,
+      cohFill: isAll ? tint('ink', 7) : tint('teal', 16),
+      cohStroke: isAll ? token('ink') : token('teal'),
     }
   }, [data, filter])
 
   /*
    * Every series on the radar tweens as one moment: the cohort shape, the
-   * university reference behind it and the four faculty outlines all belong to
+   * campus reference behind it and the four faculty outlines all belong to
    * the same filter change, so they travel on a single clock. Splitting them
    * into five hooks would put five requestAnimationFrame loops on the same
    * subtree, each re-rendering it independently.
@@ -128,7 +129,7 @@ export default function FingerprintPage() {
         sub={
           filter.fac === 'All'
             ? `Six dimensions across ${v.recs.length} assessed students, with each faculty overlaid.`
-            : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the university-wide average.`
+            : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the campus-wide average.`
         }
         /*
          * Clearing the hover alongside the filter, because picking "Engineering"
@@ -177,10 +178,10 @@ export default function FingerprintPage() {
             <div className="flex flex-none items-center justify-center px-2 pt-[34px] pb-[18px]">
               <div className="relative w-full max-w-[640px]" style={{ aspectRatio: `${VB_W}/${VB_H}` }}>
                 <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="block h-full w-full overflow-visible">
-                  <polygon points={ring(100)} fill="none" stroke="rgba(20,40,60,.13)" />
-                  <polygon points={ring(75)} fill="none" stroke="rgba(20,40,60,.09)" />
-                  <polygon points={ring(50)} fill="none" stroke="rgba(20,40,60,.09)" />
-                  <polygon points={ring(25)} fill="none" stroke="rgba(20,40,60,.07)" />
+                  <polygon points={ring(100)} fill="none" style={{ stroke: tint('ink', 13) }} />
+                  <polygon points={ring(75)} fill="none" style={{ stroke: tint('ink', 9) }} />
+                  <polygon points={ring(50)} fill="none" style={{ stroke: tint('ink', 9) }} />
+                  <polygon points={ring(25)} fill="none" style={{ stroke: tint('ink', 7) }} />
                   <g className="chart-bloom">
                     {v.isAll &&
                       facMeans.map((m, k) => (
