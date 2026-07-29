@@ -83,6 +83,115 @@ export function movers(data: DemoData): Mover[] {
   return out.sort((a, b) => Math.abs(b.d) - Math.abs(a.d))
 }
 
+/** A signed bar drawn from the centre of its track. */
+export interface CentredBar {
+  txt: string
+  color: string
+  /** Bar width as a percentage of the track. */
+  w: number
+  /** Left offset as a percentage — 50 for a rise, 50-w for a fall. */
+  l: number
+}
+
+function centredBar(d: number, span: number): CentredBar {
+  const mag = Math.min(Math.abs(d) / 8, 1) * span
+  return {
+    txt: (d > 0 ? '+' : '') + d.toFixed(1),
+    color: d >= 0 ? '#5E8F80' : '#A6503F',
+    w: +mag.toFixed(1),
+    l: d >= 0 ? 50 : +(50 - mag).toFixed(1),
+  }
+}
+
+/** Per-faculty mean change on each dimension, first assessment → re-assessment. */
+export function facultyDeltas(data: DemoData) {
+  return data.FACULTIES.map((f) => {
+    const ids = data.pairIds.filter((id) => data.byId[id].faculty === f.name)
+    return {
+      name: f.name,
+      bars: data.T.map((t) => {
+        const d = ids.length
+          ? ids.reduce((s, id) => s + (data.w2[id].sc[t] - data.w1[id].sc[t]), 0) / ids.length
+          : 0
+        return centredBar(d, 44)
+      }),
+    }
+  })
+}
+
+export function topMovers(data: DemoData, n = 4) {
+  return movers(data).slice(0, n).map((m) => ({ name: m.name, ...centredBar(m.d, 48) }))
+}
+
+export interface Migration {
+  id: SegmentId
+  name: string
+  color: string
+  n: number
+  out: number
+  stay: number
+  empty: boolean
+  line: string
+  stayW: number
+  outW: number
+  note: string
+}
+
+/**
+ * Where each Wave-1 segment's members ended up at Wave 2. Only students with
+ * both assessments (pairIds) can migrate, so that is the population.
+ */
+export function migration(data: DemoData): Migration[] {
+  const w1seg: Record<string, SegmentId> = {}
+  const w2seg: Record<string, SegmentId> = {}
+  for (const id of data.pairIds) {
+    w1seg[id] = data.segOf(data.w1[id].sc, data.byId[id])
+    w2seg[id] = data.segOf(data.w2[id].sc, data.byId[id])
+  }
+  return data.SEGS.filter((g) => g.id !== 'unflagged').map((g) => {
+    const ids = data.pairIds.filter((id) => w1seg[id] === g.id)
+    const out = ids.filter((id) => w2seg[id] !== g.id).length
+    const stay = ids.length - out
+    const dest: Partial<Record<SegmentId, number>> = {}
+    for (const id of ids) {
+      const d = w2seg[id]
+      if (d !== g.id) dest[d] = (dest[d] ?? 0) + 1
+    }
+    const top = (Object.keys(dest) as SegmentId[]).sort((a, b) => dest[b]! - dest[a]!)[0]
+    return {
+      id: g.id, name: g.name, color: g.color, n: ids.length, out, stay,
+      // An empty bucket here is structural, not a null result: Transition Fragile
+      // is scoped to the 2026 intake, and the twice-assessed population is the
+      // 2024/2025 intakes. Rendering "0 → 0 STAYED · 0 MOVED" reads as a bug.
+      empty: ids.length === 0,
+      line: ids.length === 0 ? 'NOT YET MEASURABLE' : `${ids.length} → ${stay} STAYED · ${out} MOVED`,
+      stayW: ids.length ? Math.round((stay / ids.length) * 100) : 0,
+      outW: ids.length ? Math.round((out / ids.length) * 100) : 0,
+      note:
+        ids.length === 0
+          ? 'Nobody in the twice-assessed group matched this pattern at baseline — it is scoped to the 2026 intake, who have only been assessed once so far.'
+          : top
+            ? `Most of the movers landed in ${data.SEGS.find((s) => s.id === top)!.name} (${dest[top]}).`
+            : 'Everyone who started here stayed here.',
+    }
+  })
+}
+
+/** The proof-it-worked line: Silent Contributors who left the pattern, and why. */
+export function migrationHeadline(data: DemoData) {
+  const silent = migration(data).find((m) => m.id === 'silent')!
+  const ids = data.pairIds.filter((id) => data.segOf(data.w1[id].sc, data.byId[id]) === 'silent')
+  const rise = ids.length
+    ? (ids.reduce((a, id) => a + (data.w2[id].sc.so - data.w1[id].sc.so), 0) / ids.length).toFixed(1)
+    : '0'
+  return {
+    n: silent.n,
+    out: silent.out,
+    seg: 'Silent Contributors',
+    tail: `Sociocentricity in that group rose ${rise} points on average after the team-role intervention.`,
+  }
+}
+
 export interface Checkpoint {
   yr: string
   assessed: number
