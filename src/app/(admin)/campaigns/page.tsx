@@ -66,7 +66,7 @@ export default function CampaignsPage() {
 
   return (
     <>
-      <Header title="Campaigns" sub={`${data.campaigns.length + newCampaigns.length} campaigns · ${1 + newCampaigns.length} in flight`}>
+      <Header title="Campaigns" sub={newCampaigns.length ? `${data.campaigns.length + newCampaigns.length} sends. ${newCampaigns.length} just created, one still in flight.` : 'Three sends. One is still in flight.'}>
         <HeaderButton tone="solid" onClick={() => router.push('/campaigns/new')}>New campaign</HeaderButton>
       </Header>
 

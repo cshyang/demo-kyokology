@@ -31,7 +31,7 @@ export const SEGMENT_META: Record<
   silent: { rule: 'SOCIO < 35 · SECURITY > 65', tone: 'SHADOW', action: 'Structured role assignment' },
   driven: { rule: 'SELF-ACT > 80 · EGO < 40', tone: 'SHADOW', action: 'Early check-in; workload pacing' },
   explorer: { rule: 'COMPLEXITY > 80 · SECURITY < 35', tone: 'DYNAMIC', action: 'Elective breadth; research placement' },
-  fragile: { rule: 'SECURITY < 35 · COMPLEXITY < 40 · 2026', tone: 'SHADOW', action: 'Orientation follow-up, week 4' },
+  fragile: { rule: 'SECURITY < 35 · CPX < 40 · 2026', tone: 'SHADOW', action: 'Orientation follow-up, week 4' },
   adrift: { rule: 'SPIRIT < 30 · SELF-ACT < 45', tone: 'SHADOW', action: 'Values and careers conversation' },
   steady: { rule: 'ALL SIX 35–70', tone: 'HEALTHY', action: 'No action needed' },
   unflagged: { rule: 'NO RULE MATCHED', tone: 'NEUTRAL', action: 'Monitor only' },

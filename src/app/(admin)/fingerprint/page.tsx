@@ -73,8 +73,23 @@ export default function FingerprintPage() {
       .sort((a, b) => b[1] - a[1])
       .map(([name, n]) => ({ name, n, w: (n / archMax) * 100 }))
 
+    // The lead reports the widest faculty gap, so it has to find it rather than
+    // quote it: pick the dimension with the largest spread, then name the ends.
+    let wi = 0, wd = 0
+    for (let i = 0; i < 6; i++) {
+      const vals = facMeans.map((m) => m[i])
+      const d = Math.max(...vals) - Math.min(...vals)
+      if (d > wd) { wd = d; wi = i }
+    }
+    const ranked = data.FACULTIES.map((f, i) => ({ name: f.name, v: facMeans[i][wi] })).sort((a, b) => b.v - a.v)
+
     return {
       recs, coh, uni, isAll, facMeans, axes, archRows,
+      lead:
+        `Across ${recs.length} assessed students the four faculties are more alike than different — ` +
+        `the widest gap is ${wd} points, on ${data.LABELS[wi]}, between ${ranked[0].name} (${ranked[0].v}) ` +
+        `and ${ranked[3].name} (${ranked[3].v}). The commonest reading is ${archRows[0]?.name ?? '—'}, ` +
+        `${archRows[0]?.n ?? 0} students.`,
       refLabel: filter.wave === 'latest' ? 'University' : `University · ${WAVE_NAME[filter.wave]}`,
       caption: isAll
         ? 'Each axis shows the cohort mean and the spread across the four faculties.'
@@ -93,15 +108,18 @@ export default function FingerprintPage() {
 
   return (
     <>
-      <Header title="Fingerprint" sub={`${v.recs.length} students in view · six-dimension mean`}>
-        <CohortFilters value={filter} onChange={setFilter} />
-      </Header>
+      <Header
+        title="Cohort fingerprint"
+        sub={
+          filter.fac === 'All'
+            ? `Six dimensions across ${v.recs.length} assessed students, with each faculty overlaid.`
+            : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the university-wide average.`
+        }
+        filters={<CohortFilters value={filter} onChange={setFilter} />}
+      />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-[#FCFCFA] px-[26px] py-[22px]">
-        <p className="max-w-[86ch] px-0.5 pt-0.5 text-[13.5px] leading-[1.7] text-pretty text-ink/72">
-          Faculties are generated from different mean vectors, so the separation you see is real signal rather than
-          noise — switch the filter to one faculty and the shape moves against the university reference.
-        </p>
+        <p className="max-w-[86ch] px-0.5 pt-0.5 text-[13.5px] leading-[1.7] text-pretty text-ink/72">{v.lead}</p>
 
         <div className="grid content-start gap-4 [grid-template-columns:repeat(auto-fit,minmax(380px,1fr))]">
           <section className="flex min-w-0 flex-col self-start rounded-[10px] border border-ink/10 bg-white p-[22px_26px]">

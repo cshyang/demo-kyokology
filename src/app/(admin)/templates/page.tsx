@@ -29,7 +29,7 @@ export default function TemplatesPage() {
 
   return (
     <>
-      <Header title="Templates" sub="Three messages · edits apply everywhere they are used">
+      <Header title="Templates" sub="Edit on the left, preview on the right. Tokens resolve against a real student.">
         <HeaderButton onClick={resetTemplates}>Reset to default</HeaderButton>
       </Header>
 

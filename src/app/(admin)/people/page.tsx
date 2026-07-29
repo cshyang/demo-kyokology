@@ -85,9 +85,13 @@ export default function PeoplePage() {
 
   return (
     <>
-      <Header title="People" sub={`${everyone.length} on record · importing never sends an invite`}>
-        <HeaderButton onClick={() => setImportOpen((o) => !o)}>{importOpen ? 'Close' : 'Import CSV'}</HeaderButton>
-      </Header>
+      <Header
+        title="People"
+        sub={`${everyone.length} on record — the operational directory: who exists, and whether they have ever been assessed.`}
+        filters={
+          <HeaderButton onClick={() => setImportOpen((o) => !o)}>{importOpen ? 'Close' : 'Import CSV'}</HeaderButton>
+        }
+      />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-hidden bg-[#FCFCFA] px-[26px] py-[22px]">
         {toast && (

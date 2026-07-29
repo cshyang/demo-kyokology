@@ -45,27 +45,69 @@
   --spacing-header: 70px;
 }
 
-html,
-body {
-  margin: 0;
-  height: 100%;
-  background: #fff;
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
+/*
+ * These are element defaults, so they belong in @layer base.
+ *
+ * Unlayered CSS beats anything inside a cascade layer no matter how specific,
+ * so an unlayered `a { color }` silently outranks every `text-*` utility on a
+ * link. The prototype never hit this — its nav rows are <div onClick>, not
+ * anchors — but ours are real <Link>s, and the whole sidebar came out teal.
+ */
+@layer base {
+  html,
+  body {
+    margin: 0;
+    height: 100%;
+    background: #fff;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: var(--color-teal);
+  }
+  a:hover {
+    color: var(--color-ink);
+  }
 }
 
-a {
-  color: var(--color-teal);
-}
-a:hover {
-  color: var(--color-ink);
-}
+/*
+ * Mono roles. The prototype uses IBM Plex Mono at four distinct settings, and
+ * they are not interchangeable — each marks a different rank of label. Eyeballing
+ * one utility into the other three with tracking-normal overrides is how the
+ * sidebar lost its hierarchy the first time.
+ */
 
-/* Small-caps mono eyebrow — used on nearly every panel in the prototype. */
+/* Small-caps mono eyebrow — panel and KPI labels, the commonest of the four. */
 @utility eyebrow {
   font-family: var(--font-mono);
   font-size: 10px;
   line-height: 1.5;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+/* Sidebar group headings: ANALYSE / OPERATE. Tighter and far wider-tracked. */
+@utility nav-group {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Sidebar footer provenance. Untracked — it is data, not a label. */
+@utility seed-line {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* Inline rule/stat mono inside cards. No tracking, sits under a bold title. */
+@utility rule-mono {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  line-height: 1.4;
 }

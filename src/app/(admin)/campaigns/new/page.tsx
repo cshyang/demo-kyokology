@@ -64,7 +64,7 @@ export default function NewCampaignPage() {
 
   return (
     <>
-      <Header title="New campaign" sub={`Step ${step + 1} of 4 · ${STEPS[step]}`}>
+      <Header title="New campaign" sub="Nothing sends until the last step.">
         <Link href="/campaigns" className="rounded-md border border-ink/18 px-[13px] py-[9px] text-[11.5px] leading-none font-bold text-ink hover:bg-parchment">
           Cancel
         </Link>

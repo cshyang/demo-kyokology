@@ -108,7 +108,7 @@ export default function OverviewPage() {
   return (
     <>
       <Header title="Overview" sub="Kykology University · 6D Profile deployment · as of 2 November 2026">
-        <HeaderButton onClick={() => router.push('/people')}>Invite someone</HeaderButton>
+        {/* Invite someone now lives in Header — it is on every screen, not just this one. */}
         <HeaderButton tone="solid" onClick={() => router.push('/campaigns/new')}>New campaign</HeaderButton>
       </Header>
 

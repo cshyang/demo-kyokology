@@ -33,18 +33,24 @@ export default function StudentsPage() {
 
   return (
     <>
-      <Header title="Students" sub={`${rows.length} of ${data.students.length} on record`}>
-        <CohortFilters value={filter} onChange={setFilter} />
-        <select
-          className="rounded-md border border-ink/16 bg-white px-2 py-1.5 text-[12px] font-bold text-ink"
-          value={done}
-          onChange={(e) => setDone(e.target.value as Done)}
-        >
-          <option value="all">Any status</option>
-          <option value="done">Has a profile</option>
-          <option value="none">No profile yet</option>
-        </select>
-      </Header>
+      <Header
+        title="Students"
+        sub={`${rows.length} of ${data.students.length} people match. Click a row for the profile.`}
+        filters={
+          <>
+            <CohortFilters value={filter} onChange={setFilter} showWave={false} />
+            <select
+              className="rounded-md border border-ink/16 bg-white px-2 py-1.5 text-[12px] font-bold text-ink"
+              value={done}
+              onChange={(e) => setDone(e.target.value as Done)}
+            >
+              <option value="all">Any status</option>
+              <option value="done">Has a profile</option>
+              <option value="none">No profile yet</option>
+            </select>
+          </>
+        }
+      />
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-[#FCFCFA] px-[26px] py-[22px]">
         <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-ink/10 bg-white">

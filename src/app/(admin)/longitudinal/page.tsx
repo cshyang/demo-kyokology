@@ -5,8 +5,11 @@ import { Header } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { facultyDeltas, migration, migrationHeadline, topMovers, type CentredBar } from '@/lib/data/derive.ts'
 
-const lead = (n: number) =>
-  `The same ${n} students, assessed twice a year apart. Everything here is a difference, not a snapshot — which is the only way to tell whether an intervention did anything or the cohort simply changed.`
+/** Built from live values, not pasted: the design's lead reports the numbers it is sitting above. */
+const lead = (out: number, n: number, mover: string, txt: string, churnPct: number) =>
+  `Between the two assessments, ${out} of ${n} Silent Contributors moved out of the pattern, and the ` +
+  `single biggest shift was ${mover.toLowerCase()} at ${txt} points. Labels stayed put: archetype churn ` +
+  `was ${churnPct}% against an 8% ceiling.`
 
 /** A bar drawn from the centre line: right for a rise, left for a fall. */
 function Bar({ bar, height = 16 }: { bar: CentredBar; height?: number }) {
@@ -39,11 +42,19 @@ export default function LongitudinalPage() {
     <>
       <Header
         title="Longitudinal"
-        sub={`${data.pairIds.length} students assessed twice · Oct 2025 baseline vs Oct 2026 re-assessment`}
+        sub={`Wave 1 · Oct 2025 against Wave 2 · Oct 2026 — ${data.pairIds.length} students took both.`}
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-auto bg-[#FCFCFA] px-[26px] py-[22px]">
-        <p className="max-w-[86ch] px-0.5 pt-0.5 text-[13.5px] leading-[1.7] text-pretty text-ink/72">{lead(data.pairIds.length)}</p>
+        <p className="max-w-[86ch] px-0.5 pt-0.5 text-[13.5px] leading-[1.7] text-pretty text-ink/72">
+          {lead(
+            v.headline.out,
+            v.headline.n,
+            v.movers[0].name,
+            v.movers[0].txt,
+            data.churnPct,
+          )}
+        </p>
 
         <div className="grid flex-none gap-4 [grid-template-columns:repeat(auto-fit,minmax(360px,1fr))]">
           <section className="rounded-[10px] border border-ink/10 bg-white p-[18px_20px]">
