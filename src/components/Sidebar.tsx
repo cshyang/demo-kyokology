@@ -8,7 +8,7 @@ const ANALYSE = [
   { href: '/fingerprint', label: 'Fingerprint' },
   { href: '/segments', label: 'Segments' },
   { href: '/longitudinal', label: 'Longitudinal' },
-  { href: '/people', label: 'Students' },
+  { href: '/students', label: 'Students' },
 ]
 const OPERATE = [
   { href: '/campaigns', label: 'Campaigns' },
