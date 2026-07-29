@@ -440,6 +440,23 @@ segment-migration number that makes the longitudinal story land.
 
 ## 8. Technical approach
 
+> **§8 ADDENDUM 2 — as built.**
+>
+> Shipped on **Next.js 16 App Router + Tailwind v4**, exported statically
+> (`output: 'export'`) to **Cloudflare Workers static assets** on the free plan.
+>
+> This refines Addendum 1 rather than reversing it. That note conflated two separate
+> decisions: *which framework* and *which output mode*. The framework choice is what
+> preserves the ceiling and the agent-maintainability argument, and it stands. The output
+> mode is a deploy detail — every route in the finished app prerenders, so exporting costs
+> nothing today and saves the OpenNext adapter, the 3 MiB Worker-script limit, and the
+> $5/mo. The day a server is needed, deleting one line from `next.config.ts` and adding
+> `@opennextjs/cloudflare` restores the original plan. That is a deploy change, not a
+> migration, precisely *because* the app is full App Router rather than a Vite SPA.
+>
+> The constraint this imposes is documented at the top of `next.config.ts`, where anyone
+> about to write a route handler will actually read it.
+
 > **§8 ADDENDUM — the stack decision changed. Read this first.**
 >
 > The analysis below argued for Vite + React Router on the criterion "smallest thing that works

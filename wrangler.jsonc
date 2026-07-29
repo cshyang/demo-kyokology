@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kykology-admin-demo",
+  "compatibility_date": "2026-07-01",
+  "assets": {
+    "directory": "./out",
+    // Each route exports a real .html file, so serve those directly and fall
+    // back to the exported 404 page. Do NOT use "single-page-application"
+    // here — that would return index.html with a 200 for every unknown path,
+    // and a demo that never 404s hides broken links rather than showing them.
+    "not_found_handling": "404-page"
+  }
+}
