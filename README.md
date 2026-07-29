@@ -1,7 +1,7 @@
-# KYKOLOGY — university admin demo
+# KYKOLOGY™ Campus — admin demo
 
 A clickable, fully explorable sales-pitch artifact for KYKOLOGY's 6D Profile, aimed at
-university administrators. Every number on screen is generated from a fixed seed. Nothing is
+campus administrators. Every number on screen is generated from a fixed seed. Nothing is
 sent, stored, or persisted.
 
 **Live: <https://kykology-admin-demo.cshyang-chng.workers.dev>**

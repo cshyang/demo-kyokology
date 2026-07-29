@@ -8,8 +8,8 @@ const lato = Lato({ subsets: ['latin'], weight: ['400', '700', '900'], variable:
 const mono = IBM_Plex_Mono({ subsets: ['latin'], weight: ['400', '500', '600'], variable: '--font-mono' })
 
 export const metadata: Metadata = {
-  title: 'KYKOLOGY · Admin',
-  description: 'University admin platform for the KYKOLOGY 6D Profile.',
+  title: 'KYKOLOGY™ Campus · Admin',
+  description: 'KYKOLOGY Campus — the admin platform for the KYKOLOGY 6D Profile.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -8,6 +8,7 @@ import type { Dim, SegmentId, WaveResult } from '@/lib/data/generator.ts'
 import {
   BlueprintLegend, FacetPanel, Heading, Prose, QualityPanel, ReflectionPanel, ReportPanel, TraitCard,
 } from './ProfileLayers.tsx'
+import { tint, token } from '@/lib/color'
 
 /** The two dimensions each rule actually constrains — the axes worth plotting. */
 const RULE_AXES: Record<SegmentId, { x: Dim; y: Dim; label: string }> = {
@@ -21,11 +22,11 @@ const RULE_AXES: Record<SegmentId, { x: Dim; y: Dim; label: string }> = {
 }
 
 const STATUS_TONE: Record<string, string> = {
-  completed: '#5E8F80',
-  started: '#B98B3C',
-  opened: '#14283C',
-  sent: '#8A8F94',
-  bounced: '#A6503F',
+  completed: token('sage'),
+  started: token('gold'),
+  opened: token('ink'),
+  sent: token('stone'),
+  bounced: token('rust'),
 }
 
 export function StudentProfile({ id }: { id: string }) {
@@ -100,21 +101,21 @@ export function StudentProfile({ id }: { id: string }) {
                 style={{
                   background: sel ? '#fff' : 'transparent',
                   boxShadow: sel
-                    ? 'inset 0 0 0 1px rgba(20,40,60,.16), 0 2px 6px rgba(20,40,60,.06)'
-                    : 'inset 0 0 0 1px rgba(20,40,60,.07)',
+                    ? `inset 0 0 0 1px ${tint('ink', 16)}, 0 2px 6px ${tint('ink', 6)}`
+                    : `inset 0 0 0 1px ${tint('ink', 7)}`,
                 }}
               >
                 <div className="flex items-center gap-[9px]">
                   <span
                     className="size-2.5 flex-none rounded-full"
                     style={{
-                      background: sel ? '#14283C' : '#fff',
-                      boxShadow: sel ? 'none' : 'inset 0 0 0 2px rgba(20,40,60,.25)',
+                      background: sel ? token('ink') : '#fff',
+                      boxShadow: sel ? 'none' : `inset 0 0 0 2px ${tint('ink', 25)}`,
                     }}
                   />
                   <span
                     className="font-mono text-[9.5px] leading-none font-bold tracking-[.13em]"
-                    style={{ color: sel ? '#14283C' : 'rgba(20,40,60,.55)' }}
+                    style={{ color: sel ? token('ink') : tint('ink', 55) }}
                   >
                     {w.n === 1 ? 'FIRST' : `ASSESSMENT ${w.n}`}
                   </span>
@@ -170,8 +171,10 @@ export function StudentProfile({ id }: { id: string }) {
                   cx={p.x}
                   cy={100 - p.y}
                   r={p.me ? 2.6 : 1.1}
-                  fill={p.me ? '#fff' : p.inside ? v.rule.color : 'rgba(20,40,60,.16)'}
-                  stroke={p.me ? '#14283C' : 'none'}
+                  style={{
+                    fill: p.me ? '#fff' : p.inside ? v.rule.color : tint('ink', 16),
+                    stroke: p.me ? token('ink') : 'none',
+                  }}
                   strokeWidth={p.me ? 2 : 0}
                 />
               ))}
@@ -197,7 +200,7 @@ export function StudentProfile({ id }: { id: string }) {
                     className="flex-none rounded-full"
                     style={
                       l.ring
-                        ? { width: 11, height: 11, border: '2px solid #14283C' }
+                        ? { width: 11, height: 11, border: `2px solid ${token('ink')}` }
                         : { width: 8, height: 8, background: l.c }
                     }
                   />
@@ -242,7 +245,7 @@ export function StudentProfile({ id }: { id: string }) {
                   <span className="flex-1 text-[12px] leading-[1.5] text-ink/70">{c.name}</span>
                   <span
                     className="flex-none font-mono text-[8.5px] leading-none font-bold tracking-[.1em]"
-                    style={{ color: STATUS_TONE[c.status] ?? '#8A8F94' }}
+                    style={{ color: STATUS_TONE[c.status] ?? token('stone') }}
                   >
                     {c.status.toUpperCase()}
                   </span>

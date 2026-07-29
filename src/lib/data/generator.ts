@@ -1,3 +1,5 @@
+import { tint, token } from '../color.ts'
+
 /**
  * KYKOLOGY 6D — seeded demo data generator.
  *
@@ -174,13 +176,13 @@ export function buildData() {
   }
 
   const SEGS: Segment[] = [
-    { id: 'silent', name: 'Silent Contributors', color: '#1E6F63', tint: 'rgba(30,111,99,.10)', test: (sc) => sc.so < 35 && sc.se > 65 },
-    { id: 'driven', name: 'Driven, Under-Regulated', color: '#A6503F', tint: 'rgba(166,80,63,.10)', test: (sc) => sc.sa > 80 && sc.e < 40 },
-    { id: 'explorer', name: 'Under-stretched Explorers', color: '#B98B3C', tint: 'rgba(185,139,60,.12)', test: (sc) => sc.c > 80 && sc.se < 35 },
-    { id: 'fragile', name: 'Transition Fragile', color: '#6E96BF', tint: 'rgba(110,150,191,.13)', test: (sc, st) => sc.se < 35 && sc.c < 40 && st.intakeYear === 2026 },
-    { id: 'adrift', name: 'Purpose Adrift', color: '#2F4A63', tint: 'rgba(47,74,99,.10)', test: (sc) => sc.sp < 30 && sc.sa < 45 },
-    { id: 'steady', name: 'Steady Core', color: '#5E8F80', tint: 'rgba(94,143,128,.11)', test: (sc) => T.every((t) => sc[t] >= 35 && sc[t] <= 70) },
-    { id: 'unflagged', name: 'Unflagged', color: '#8A8F94', tint: 'rgba(20,40,60,.04)', test: () => true },
+    { id: 'silent', name: 'Silent Contributors', color: token('teal'), tint: tint('teal', 10), test: (sc) => sc.so < 35 && sc.se > 65 },
+    { id: 'driven', name: 'Driven, Under-Regulated', color: token('rust'), tint: tint('rust', 10), test: (sc) => sc.sa > 80 && sc.e < 40 },
+    { id: 'explorer', name: 'Under-stretched Explorers', color: token('gold'), tint: tint('gold', 12), test: (sc) => sc.c > 80 && sc.se < 35 },
+    { id: 'fragile', name: 'Transition Fragile', color: token('sky'), tint: tint('sky', 13), test: (sc, st) => sc.se < 35 && sc.c < 40 && st.intakeYear === 2026 },
+    { id: 'adrift', name: 'Purpose Adrift', color: token('slate'), tint: tint('slate', 10), test: (sc) => sc.sp < 30 && sc.sa < 45 },
+    { id: 'steady', name: 'Steady Core', color: token('sage'), tint: tint('sage', 11), test: (sc) => T.every((t) => sc[t] >= 35 && sc[t] <= 70) },
+    { id: 'unflagged', name: 'Unflagged', color: token('stone'), tint: tint('ink', 4), test: () => true },
   ]
   const segOf = (sc: Scores, st: Student): SegmentId => SEGS.find((g) => g.test(sc, st))!.id
 

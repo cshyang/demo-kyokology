@@ -48,7 +48,7 @@ export function HeaderButton({
       className={
         tone === 'solid'
           ? 'cursor-pointer rounded-md bg-brass px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink hover:opacity-90'
-          : 'cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.18)] hover:bg-cream'
+          : 'cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink inset-ring inset-ring-ink/18 hover:bg-cream'
       }
     >
       {children}
