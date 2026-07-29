@@ -56,12 +56,12 @@ export function QuickInvite() {
 
       {open && (
         <div
-          className="fixed inset-0 z-80 flex items-center justify-center bg-ink/34"
+          className="backdrop-in fixed inset-0 z-80 flex items-center justify-center bg-ink/34"
           onClick={closeInvite}
           role="presentation"
         >
           <div
-            className="w-[520px] overflow-hidden rounded-xl bg-white shadow-[0_24px_60px_rgba(20,40,60,.32)]"
+            className="panel-in w-[520px] overflow-hidden rounded-xl bg-white shadow-[0_24px_60px_rgba(20,40,60,.32)]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="border-b border-ink/8 px-6 py-5">
@@ -127,7 +127,7 @@ export function QuickInvite() {
       {toast && (
         <div
           onClick={() => setToast('')}
-          className="fixed bottom-[26px] left-1/2 z-90 flex -translate-x-1/2 cursor-pointer items-center gap-3 rounded-lg bg-ink px-[18px] py-[13px] text-white shadow-[0_6px_20px_rgba(20,40,60,.24)]"
+          className="toast-in fixed bottom-[26px] left-1/2 z-90 flex -translate-x-1/2 cursor-pointer items-center gap-3 rounded-lg bg-ink px-[18px] py-[13px] text-white shadow-[0_6px_20px_rgba(20,40,60,.24)]"
         >
           <span className="size-[7px] rounded-full bg-brass" />
           <span className="text-[12.5px] leading-none">{toast}</span>

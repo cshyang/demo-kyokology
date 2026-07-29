@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { Header } from '@/components/Header'
 import { CohortFilters } from '@/components/CohortFilters'
 import { useDemoData } from '@/lib/data/demo.ts'
+import { useTweenedNumbers } from '@/lib/use-tweened-numbers.ts'
 import { meanOf, recordFor, selectRecords, type CohortFilter } from '@/lib/data/derive.ts'
 
 // Radar geometry, verbatim from the prototype so the shape is identical.
@@ -22,6 +23,8 @@ const ring = (v: number) => poly(Array(6).fill(v))
 export default function FingerprintPage() {
   const data = useDemoData()
   const [filter, setFilter] = useState<CohortFilter>({ fac: 'All', yr: 'All', wave: 'latest' })
+  /** Which faculty the pointer is over in the legend, so the other three can fall back. */
+  const [hoverFac, setHoverFac] = useState<number | null>(null)
 
   const v = useMemo(() => {
     const recs = selectRecords(data, filter)
@@ -51,14 +54,14 @@ export default function FingerprintPage() {
       const lo = vals.length ? Math.min(...vals) : 0
       const hi = vals.length ? Math.max(...vals) : 0
       const d = coh[i] - uni[i]
-      const [vx, vy] = point(i, coh[i])
+      // No vertex or headline number here: both ride the tweened values and are
+      // computed at render, so the memo only carries what holds still.
       return {
-        label, vx, vy,
+        label,
         lpct: (lx / VB_W) * 100,
         tpct: (ly / VB_H) * 100,
         // Which side of the circle the label sits on decides how it is nudged clear of the shape.
         place: i === 0 ? 'top' : i === 3 ? 'bottom' : co > 0 ? 'right' : 'left',
-        txt: isAll ? String(coh[i]) : `${coh[i]} / ${uni[i]}`,
         sub: isAll
           ? `${lo}–${hi} by faculty`
           : d === 0 ? '' : `${d > 0 ? '+' : ''}${d} vs ${refShort}`,
@@ -99,6 +102,18 @@ export default function FingerprintPage() {
     }
   }, [data, filter])
 
+  /*
+   * Every series on the radar tweens as one moment: the cohort shape, the
+   * university reference behind it and the four faculty outlines all belong to
+   * the same filter change, so they travel on a single clock. Splitting them
+   * into five hooks would put five requestAnimationFrame loops on the same
+   * subtree, each re-rendering it independently.
+   */
+  const tweened = useTweenedNumbers([...v.coh, ...v.uni, ...v.facMeans.flat()])
+  const coh = tweened.slice(0, 6)
+  const uni = tweened.slice(6, 12)
+  const facMeans = [0, 1, 2, 3].map((k) => tweened.slice(12 + k * 6, 18 + k * 6))
+
   const placement: Record<string, string> = {
     top: 'translate(-50%, calc(-100% - 10px)) ',
     bottom: 'translate(-50%, 12px)',
@@ -115,7 +130,14 @@ export default function FingerprintPage() {
             ? `Six dimensions across ${v.recs.length} assessed students, with each faculty overlaid.`
             : `Six dimensions across ${v.recs.length} ${filter.fac} students, against the university-wide average.`
         }
-        filters={<CohortFilters value={filter} onChange={setFilter} />}
+        /*
+         * Clearing the hover alongside the filter, because picking "Engineering"
+         * unmounts the four faculty chips and React fires no mouseleave on an
+         * element that no longer exists. hoverFac would stay pinned at whichever
+         * chip the pointer was resting on, leaving the cohort shape at 25% with
+         * nothing left on screen to hover off.
+         */
+        filters={<CohortFilters value={filter} onChange={(next) => { setHoverFac(null); setFilter(next) }} />}
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-[#FCFCFA] px-[26px] py-[22px]">
@@ -159,20 +181,50 @@ export default function FingerprintPage() {
                   <polygon points={ring(75)} fill="none" stroke="rgba(20,40,60,.09)" />
                   <polygon points={ring(50)} fill="none" stroke="rgba(20,40,60,.09)" />
                   <polygon points={ring(25)} fill="none" stroke="rgba(20,40,60,.07)" />
-                  {v.isAll &&
-                    v.facMeans.map((m, k) => (
-                      <polygon key={k} points={poly(m)} fill="none" stroke={FACULTY_COLORS[k]} strokeWidth={1.4} opacity={0.55} />
-                    ))}
-                  {!v.isAll && (
-                    <polygon points={poly(v.uni)} fill="rgba(196,194,187,.45)" stroke="#B4B2AB" strokeWidth={1.6} strokeDasharray="4 3" />
-                  )}
-                  <polygon points={poly(v.coh)} fill={v.cohFill} stroke={v.cohStroke} strokeWidth={2.4} />
-                  {v.axes.map((ax) => (
-                    <circle key={ax.label} cx={ax.vx} cy={ax.vy} r={3.4} fill={v.cohStroke} />
-                  ))}
+                  <g className="chart-bloom">
+                    {v.isAll &&
+                      facMeans.map((m, k) => (
+                        <polygon
+                          key={k}
+                          className="chart-fade"
+                          points={poly(m)}
+                          fill="none"
+                          stroke={FACULTY_COLORS[k]}
+                          strokeWidth={hoverFac === k ? 2.6 : 1.4}
+                          opacity={hoverFac === null ? 0.55 : hoverFac === k ? 1 : 0.12}
+                        />
+                      ))}
+                    {!v.isAll && (
+                      <polygon points={poly(uni)} fill="rgba(196,194,187,.45)" stroke="#B4B2AB" strokeWidth={1.6} strokeDasharray="4 3" />
+                    )}
+                    <polygon
+                      className="chart-fade"
+                      points={poly(coh)}
+                      fill={v.cohFill}
+                      stroke={v.cohStroke}
+                      strokeWidth={2.4}
+                      opacity={hoverFac === null ? 1 : 0.25}
+                    />
+                    {v.axes.map((ax, i) => {
+                      // Rides the tweened value, so the dot stays welded to the
+                      // corner of the shape for every frame of the move.
+                      const [vx, vy] = point(i, coh[i])
+                      return (
+                        <circle
+                          key={ax.label}
+                          className="chart-fade"
+                          cx={vx}
+                          cy={vy}
+                          r={3.4}
+                          fill={v.cohStroke}
+                          opacity={hoverFac === null ? 1 : 0.25}
+                        />
+                      )
+                    })}
+                  </g>
                 </svg>
 
-                {v.axes.map((ax) => (
+                {v.axes.map((ax, i) => (
                   <div
                     key={ax.label}
                     className="absolute whitespace-nowrap"
@@ -184,7 +236,15 @@ export default function FingerprintPage() {
                     }}
                   >
                     <div className="eyebrow text-[9px] tracking-[.12em] text-ink/50">{ax.label}</div>
-                    <div className="mt-1.5 text-[15px] leading-none font-bold text-ink">{ax.txt}</div>
+                    {/*
+                      Counts on the same clock as the shape rather than cutting to
+                      the new figure — the number and the vertex it labels arrive
+                      together. tabular-nums keeps the label from twitching sideways
+                      as digits change width mid-count.
+                    */}
+                    <div className="mt-1.5 text-[15px] leading-none font-bold tabular-nums text-ink">
+                      {v.isAll ? Math.round(coh[i]) : `${Math.round(coh[i])} / ${Math.round(uni[i])}`}
+                    </div>
                     <div className="mt-1.5 font-mono text-[9.5px] leading-none" style={{ color: ax.subcol }}>
                       {ax.sub}
                     </div>
@@ -202,7 +262,14 @@ export default function FingerprintPage() {
               {v.isAll ? (
                 <span className="flex items-center gap-3.5">
                   {data.FACULTIES.map((f, k) => (
-                    <span key={f.name} className="flex items-center gap-[7px] text-[11.5px] leading-[1.4] text-ink/55">
+                    <span
+                      key={f.name}
+                      onMouseEnter={() => setHoverFac(k)}
+                      onMouseLeave={() => setHoverFac(null)}
+                      className={`flex cursor-default items-center gap-[7px] text-[11.5px] leading-[1.4] transition-colors ${
+                        hoverFac === k ? 'text-ink' : 'text-ink/55'
+                      }`}
+                    >
                       <span className="h-0.5 w-3 flex-none" style={{ background: FACULTY_COLORS[k] }} />
                       {f.name}
                     </span>
@@ -252,11 +319,17 @@ export default function FingerprintPage() {
                 The two leading dimensions, unordered — 15 possible labels.
               </p>
               <div className="mt-3">
-                {v.archRows.map((a) => (
-                  <div key={a.name} className="flex items-center gap-[11px] py-[7px]">
+                {v.archRows.map((a, i) => (
+                  <div key={a.name} className="group flex items-center gap-[11px] py-[7px]">
                     <div className="w-[130px] flex-none text-[11.5px] leading-[1.3] text-ink">{a.name}</div>
                     <div className="h-[7px] flex-1 overflow-hidden rounded-[4px] bg-line">
-                      <div className="h-full rounded-[4px] bg-slate opacity-80" style={{ width: `${a.w}%` }} />
+                      <div
+                        className="chart-bar h-full rounded-[4px] bg-slate opacity-80 group-hover:opacity-100"
+                        /* 25ms, not 50: this list runs to fifteen archetypes, and a
+                           per-row delay tuned for six would leave the last bar starting
+                           three-quarters of a second after the first. */
+                        style={{ width: `${a.w}%`, animationDelay: `${i * 25}ms` }}
+                      />
                     </div>
                     <div className="w-[30px] flex-none text-right font-mono text-[11px] leading-none font-semibold text-ink/60">
                       {a.n}

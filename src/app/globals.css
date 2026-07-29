@@ -39,6 +39,23 @@
   --font-sans: Lato, system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+  /*
+   * Motion. Three durations, one curve.
+   *
+   * This is admin software: someone is mid-task, not watching a showreel, so
+   * the ceiling is deliberately low. Feedback has to land inside the ~80ms the
+   * brain reads as instant; a state change gets 200ms; only a shape that has to
+   * physically travel — the radar morphing between two cohorts — earns 320ms.
+   *
+   * One curve, because a product surface with three easings reads as three
+   * products. Quintic ease-out decelerates hard into rest and never overshoots;
+   * bounce and elastic draw attention to the animation instead of the data.
+   */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-feedback: 120ms;
+  --dur-state: 200ms;
+  --dur-move: 320ms;
+
   /* Frame */
   --spacing-sidebar: 216px;
   --spacing-sidebar-collapsed: 64px;
@@ -68,6 +85,29 @@
   }
   a:hover {
     color: var(--color-ink);
+  }
+
+  /*
+   * Press feedback, applied to the element rather than to twenty-six class
+   * strings. Every control in the app is a <button>, so one base rule is what
+   * actually makes the affordance consistent — a utility would only be
+   * consistent until someone forgot it, and the tell of an interface that isn't
+   * quite trustworthy is the one button in five that doesn't respond.
+   *
+   * The scale is deliberately slight. These buttons run from a 90px chip to a
+   * full-width segment card, and anything deeper reads as a toy at card size.
+   */
+  button {
+    transition:
+      background-color var(--dur-feedback) var(--ease-out-quint),
+      border-color var(--dur-feedback) var(--ease-out-quint),
+      box-shadow var(--dur-feedback) var(--ease-out-quint),
+      color var(--dur-feedback) var(--ease-out-quint),
+      opacity var(--dur-feedback) var(--ease-out-quint),
+      transform var(--dur-feedback) var(--ease-out-quint);
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.985);
   }
 }
 
@@ -110,4 +150,223 @@
   font-family: var(--font-mono);
   font-size: 9.5px;
   line-height: 1.4;
+}
+
+/*
+ * Motion.
+ *
+ * The charts are hand-drawn SVG and divs, not a charting library, so there is
+ * nothing to hand an `animate` prop to.
+ *
+ * The budget goes to state transitions, not to arrival. An admin surface that
+ * performs a page-load sequence is making someone wait to start working, so the
+ * entrances here are short enough to read as the data landing rather than as
+ * choreography — the moments that earn real time are the ones the user caused.
+ *
+ * Bars reveal by clip-path rather than scaleX: scaling an 8px bar with a 4px
+ * radius from zero squashes the corners into ellipses for the length of the
+ * animation. Clipping leaves the geometry untouched.
+ */
+@keyframes chart-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes chart-pop {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chart-bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*
+ * A bar that wipes in from its left edge, then tracks later width changes.
+ *
+ * Colour and opacity are in the same shorthand rather than left to Tailwind's
+ * `transition-colors`: that utility sets transition-property outright, and
+ * whichever of the two lands later in the utilities layer silently wins.
+ */
+@utility chart-bar {
+  animation: chart-wipe var(--dur-move) var(--ease-out-quint) both;
+  transition:
+    width var(--dur-move) var(--ease-out-quint),
+    background-color var(--dur-state) var(--ease-out-quint),
+    opacity var(--dur-state) var(--ease-out-quint);
+}
+
+/*
+ * A line that draws itself. pathLength={1} on the element normalises the
+ * geometry to a unit length, so the dash values are literals and nothing has
+ * to measure the path at runtime.
+ */
+@utility chart-line {
+  stroke-dasharray: 1;
+  animation: chart-draw 0.4s var(--ease-out-quint) both;
+}
+
+@utility chart-pop {
+  animation: chart-pop var(--dur-state) var(--ease-out-quint) both;
+}
+
+/*
+ * Opacity only. For anything already carrying a `transform` of its own — the
+ * radar's axis labels are positioned with translate(-50%, …) — chart-pop's
+ * translateY would replace that transform for the length of the animation and
+ * throw the label across the card before snapping it back.
+ */
+@keyframes chart-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility chart-appear {
+  animation: chart-appear var(--dur-state) var(--ease-out-quint) both;
+}
+
+/*
+ * First-paint entrance for the radar, scaled about the centre of the viewBox.
+ * Only ever plays on mount — once the shape is on screen, a filter change moves
+ * its vertices rather than replaying this.
+ */
+@utility chart-bloom {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: chart-bloom var(--dur-move) var(--ease-out-quint) both;
+}
+
+/* Hover-linking: highlighting one series fades the rest rather than hiding them. */
+@utility chart-fade {
+  transition:
+    opacity var(--dur-state) var(--ease-out-quint),
+    stroke-width var(--dur-state) var(--ease-out-quint);
+}
+
+/*
+ * Scatter points that move when the plotted rule changes.
+ *
+ * cx/cy/r are SVG geometry attributes but also real CSS properties, so a cloud
+ * re-plotted against two different dimensions travels to its new positions
+ * instead of teleporting — the same 800 students, seen from another angle.
+ */
+@utility chart-point {
+  transition:
+    cx var(--dur-move) var(--ease-out-quint),
+    cy var(--dur-move) var(--ease-out-quint),
+    r var(--dur-state) var(--ease-out-quint),
+    fill var(--dur-state) var(--ease-out-quint);
+}
+
+/* Modal: backdrop washes in, panel rises to meet it. */
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/*
+ * Y only. The toast is centred by Tailwind's `-translate-x-1/2`, which compiles
+ * to the standalone `translate` property rather than to `transform` — the two
+ * are separate properties and compose, so re-stating the -50% here would centre
+ * the toast twice and park it half its own width off to the left.
+ *
+ * This is the opposite of the axis labels on the fingerprint radar: those carry
+ * an inline `transform`, which an animation's own transform really does replace.
+ */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility backdrop-in {
+  animation: backdrop-in var(--dur-state) var(--ease-out-quint) both;
+}
+
+@utility panel-in {
+  animation: panel-in var(--dur-move) var(--ease-out-quint) both;
+}
+
+@utility toast-in {
+  animation: toast-in var(--dur-move) var(--ease-out-quint) both;
+}
+
+/*
+ * Not optional. Vestibular disorders are triggered by exactly this kind of
+ * motion, and every animation above is decoration over content that is already
+ * fully readable without it.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .chart-bar,
+  .chart-line,
+  .chart-pop,
+  .chart-appear,
+  .chart-bloom,
+  .chart-fade,
+  .chart-point,
+  .backdrop-in,
+  .panel-in,
+  .toast-in,
+  button {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /*
+   * The press scale is a transform, not a transition, so killing the transition
+   * alone would leave it snapping to 0.985 instead of not happening at all.
+   */
+  button:active:not(:disabled) {
+    transform: none;
+  }
 }
