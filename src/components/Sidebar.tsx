@@ -12,6 +12,7 @@ const ANALYSE = [
 ]
 const OPERATE = [
   { href: '/campaigns', label: 'Campaigns' },
+  { href: '/people', label: 'People' },
   { href: '/templates', label: 'Templates' },
 ]
 
