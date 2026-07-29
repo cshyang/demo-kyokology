@@ -18,12 +18,11 @@ const TESTS = ['6D Profile', 'Resilience Snapshot', 'Values Compass']
 
 export function QuickInvite() {
   const data = useDemoData()
-  const { addPeople } = useDemoState()
-  const [open, setOpen] = useState(false)
-  const [email, setEmail] = useState('')
+  const { addPeople, invite, openInvite, closeInvite, setInviteEmail } = useDemoState()
   const [test, setTest] = useState(TESTS[0])
   const [toast, setToast] = useState('')
 
+  const { open, email } = invite
   const addr = email.trim()
   const valid = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(addr)
   const known = data.students.find((st) => st.email === addr)
@@ -39,22 +38,17 @@ export function QuickInvite() {
         ? { text: 'Not in the database — they will be created as a new person.', color: 'var(--color-gold)' }
         : { text: 'That is not a complete email address yet.', color: 'var(--color-rust)' }
 
-  function close() {
-    setOpen(false)
-    setEmail('')
-  }
-
   function send() {
     if (!valid) return
     if (!known) addPeople([{ name: addr, email: addr, faculty: 'Unassigned', intakeYear: 2026 }])
     setToast(`${known ? known.name : addr} invited to the ${test} · nothing was actually sent`)
-    close()
+    closeInvite()
   }
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => openInvite()}
         className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.18)] hover:bg-cream"
       >
         Invite someone
@@ -63,7 +57,7 @@ export function QuickInvite() {
       {open && (
         <div
           className="fixed inset-0 z-80 flex items-center justify-center bg-ink/34"
-          onClick={close}
+          onClick={closeInvite}
           role="presentation"
         >
           <div
@@ -84,7 +78,7 @@ export function QuickInvite() {
                 autoFocus
                 placeholder="name@kykology.edu"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setInviteEmail(e.target.value)}
                 className="w-full rounded-[7px] border border-ink/16 px-3 py-2.5 text-[12.5px] font-bold text-ink"
               />
               <div className="text-[11.5px] leading-[1.5]" style={{ color: match?.color }}>
@@ -111,7 +105,7 @@ export function QuickInvite() {
 
             <div className="flex items-center gap-3 border-t border-ink/8 bg-cream px-6 py-4">
               <button
-                onClick={close}
+                onClick={closeInvite}
                 className="cursor-pointer rounded-md bg-white px-[15px] py-[11px] text-[12px] leading-none font-bold text-ink shadow-[inset_0_0_0_1px_rgba(20,40,60,.18)]"
               >
                 Cancel

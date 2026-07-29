@@ -58,9 +58,10 @@ test('funnel numbers are the measured literals, not a recomputation', async () =
   const { campaignFunnel } = await import('./derive.ts')
   const d = buildData()
   const byId = Object.fromEntries(d.campaigns.map((c) => [c.id, campaignFunnel(c)]))
-  assert.deepEqual(byId.A, { bounced: 11, sent: 549, opened: 436, started: 341, completed: 291 })
-  assert.deepEqual(byId.B, { bounced: 11, sent: 549, opened: 436, started: 341, completed: 291 })
-  assert.deepEqual(byId.C, { bounced: 6, sent: 274, opened: 178, started: 114, completed: 78 })
+  // sent is the audience addressed, bounces included: 113 + 95 + 50 + 291 + 11 = 560.
+  assert.deepEqual(byId.A, { bounced: 11, sent: 560, opened: 436, started: 341, completed: 291 })
+  assert.deepEqual(byId.B, { bounced: 11, sent: 560, opened: 436, started: 341, completed: 291 })
+  assert.deepEqual(byId.C, { bounced: 6, sent: 280, opened: 178, started: 114, completed: 78 })
 })
 
 test('funnel quotas are exact and campaigns A/B cover one population', () => {
@@ -86,8 +87,8 @@ test('completed <= started <= opened <= sent holds as a cascade', () => {
     const t = c.list.reduce<Record<string, number>>(
       (m, s) => ((m[s[c.key]!] = (m[s[c.key]!] ?? 0) + 1), m), {})
     const sent = c.list.length - (t.bounced ?? 0)
-    const opened = sent - (t.sent ?? 0)
-    const started = opened - (t.opened ?? 0)
+    const opened = (t.opened ?? 0) + (t.started ?? 0) + (t.completed ?? 0)
+    const started = (t.started ?? 0) + (t.completed ?? 0)
     const completed = t.completed ?? 0
     assert.ok(completed <= started, `${c.id}: completed ${completed} > started ${started}`)
     assert.ok(started <= opened, `${c.id}: started ${started} > opened ${opened}`)

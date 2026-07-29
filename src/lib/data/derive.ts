@@ -15,17 +15,25 @@ export interface Funnel {
   completed: number
 }
 
+/**
+ * `sent` is the audience the campaign was addressed to, bounces included.
+ *
+ * Netting bounces out of the denominator and *also* reporting them ("291 of 549
+ * complete · 11 bounced") discounts them twice and quietly flatters the rate.
+ * Each stage is counted directly rather than derived by subtracting the one
+ * before it, so a status that stops matching shows up as a wrong number here
+ * instead of silently shifting every stage downstream.
+ */
 export function campaignFunnel(c: Campaign): Funnel {
-  const t: Record<string, number> = {}
+  const f: Funnel = { sent: c.list.length, opened: 0, started: 0, completed: 0, bounced: 0 }
   for (const st of c.list) {
-    const v = st[c.key]
-    if (v) t[v] = (t[v] ?? 0) + 1
+    const s = st[c.key]
+    if (s === 'bounced') f.bounced++
+    if (s === 'opened' || s === 'started' || s === 'completed') f.opened++
+    if (s === 'started' || s === 'completed') f.started++
+    if (s === 'completed') f.completed++
   }
-  const bounced = t.bounced ?? 0
-  const sent = c.list.length - bounced
-  const opened = sent - (t.sent ?? 0)
-  const started = opened - (t.opened ?? 0)
-  return { bounced, sent, opened, started, completed: t.completed ?? 0 }
+  return f
 }
 
 export function latest(data: DemoData, id: string) {

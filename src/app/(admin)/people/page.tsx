@@ -1,10 +1,9 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Header, HeaderButton } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
-import { latest } from '@/lib/data/derive.ts'
 import { useDemoState, type NewPerson } from '@/lib/demo-state'
 
 const SAMPLE = `alex.tan@kykology.edu, Alex Tan, Engineering, 2026
@@ -37,12 +36,19 @@ function parseCsv(text: string) {
   return { rows, bad }
 }
 
-const GRID = '[grid-template-columns:150px_220px_130px_60px_110px_minmax(0,1fr)_78px]'
+const GRID = '[grid-template-columns:130px_200px_110px_52px_minmax(0,1fr)_minmax(0,1fr)_60px]'
+const SELECT = 'rounded-md border border-ink/16 bg-white px-2 py-1.5 text-[12px] font-bold text-ink'
+
+type Done = 'all' | 'done' | 'none'
 
 export default function PeoplePage() {
   const data = useDemoData()
-  const { newPeople, addPeople } = useDemoState()
+  const router = useRouter()
+  const { newPeople, addPeople, openInvite } = useDemoState()
 
+  const [fac, setFac] = useState('All')
+  const [yr, setYr] = useState('All')
+  const [done, setDone] = useState<Done>('all')
   const [q, setQ] = useState('')
   const [importOpen, setImportOpen] = useState(false)
   const [paste, setPaste] = useState(SAMPLE)
@@ -65,12 +71,36 @@ export default function PeoplePage() {
   const dupes = parsed.rows.filter((r) => existingEmails.has(r.email.toLowerCase()))
   const fresh = parsed.rows.filter((r) => !existingEmails.has(r.email.toLowerCase()))
 
-  const rows = useMemo(() => {
+  /**
+   * Imported people sit above the roster, not inside it — they have no faculty,
+   * no intake and no baseline, so they would sort into a gap otherwise. They drop
+   * out entirely once you search or ask for people who already have a profile.
+   */
+  const { rows, matched, more } = useMemo(() => {
     const needle = q.trim().toLowerCase()
-    return everyone
-      .filter((p) => !needle || p.name.toLowerCase().includes(needle) || p.email.toLowerCase().includes(needle))
-      .slice(0, 200)
-  }, [everyone, q])
+    const hit = (p: { name: string; email: string }) =>
+      !needle || p.name.toLowerCase().includes(needle) || p.email.toLowerCase().includes(needle)
+
+    const roster = data.students.filter((st) => {
+      if (fac !== 'All' && st.faculty !== fac) return false
+      if (yr !== 'All' && String(st.intakeYear) !== yr) return false
+      const assessed = !!(data.w2[st.id] || data.w3[st.id])
+      if (done === 'done' && !assessed) return false
+      if (done === 'none' && assessed) return false
+      return hit(st)
+    })
+
+    const fresh = needle || done === 'done' ? [] : newPeople.filter(hit)
+    const matched = roster.length + fresh.length
+    return {
+      matched,
+      more: roster.length > 60 ? `Showing the first 60 of ${roster.length}` : `All ${matched} shown`,
+      rows: [
+        ...fresh.map((p) => ({ isNew: true as const, person: p })),
+        ...roster.slice(0, 60).map((st) => ({ isNew: false as const, person: st })),
+      ],
+    }
+  }, [data, newPeople, fac, yr, done, q])
 
   function runImport() {
     const toAdd = dedupe === 'skip' ? fresh : parsed.rows.filter((r) => !existingEmails.has(r.email.toLowerCase()))
@@ -87,9 +117,28 @@ export default function PeoplePage() {
     <>
       <Header
         title="People"
-        sub={`${everyone.length} on record — the operational directory: who exists, and whether they have ever been assessed.`}
+        sub={`${matched} on record — the operational directory: who exists, and whether they have ever been assessed.`}
         filters={
-          <HeaderButton onClick={() => setImportOpen((o) => !o)}>{importOpen ? 'Close' : 'Import CSV'}</HeaderButton>
+          <>
+            <select className={SELECT} value={fac} onChange={(e) => setFac(e.target.value)}>
+              <option value="All">All faculties</option>
+              {data.FACULTIES.map((f) => (
+                <option key={f.name} value={f.name}>{f.name}</option>
+              ))}
+            </select>
+            <select className={SELECT} value={yr} onChange={(e) => setYr(e.target.value)}>
+              <option value="All">All intakes</option>
+              <option value="2024">2024 intake</option>
+              <option value="2025">2025 intake</option>
+              <option value="2026">2026 intake</option>
+            </select>
+            <select className={SELECT} value={done} onChange={(e) => setDone(e.target.value as Done)}>
+              <option value="all">Any status</option>
+              <option value="done">Has a profile</option>
+              <option value="none">No profile yet</option>
+            </select>
+            <HeaderButton onClick={() => setImportOpen((o) => !o)}>{importOpen ? 'Close' : 'Import CSV'}</HeaderButton>
+          </>
         }
       />
 
@@ -172,13 +221,15 @@ export default function PeoplePage() {
           </section>
         )}
 
-        <input
-          type="text"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={`Search ${everyone.length} people by name or email`}
-          className="w-full flex-none rounded-[7px] border border-ink/16 bg-white p-[10px_12px] text-[12.5px] font-bold text-ink"
-        />
+        <div className="max-w-[360px] flex-none">
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder={`Search ${everyone.length} people by name or email`}
+            className="w-full rounded-[7px] border border-ink/16 bg-white p-[10px_12px] text-[12.5px] font-bold text-ink"
+          />
+        </div>
 
         <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-ink/10 bg-white">
           <div className={`grid flex-none gap-3 border-b border-ink/8 bg-cream p-[10px_18px] ${GRID}`}>
@@ -187,26 +238,42 @@ export default function PeoplePage() {
             ))}
           </div>
           <div className="min-h-0 flex-1 overflow-auto">
-            {rows.map((p) => {
-              const r = p.isNew ? null : latest(data, p.id)
-              const seg = r ? data.SEGS.find((g) => g.id === r.seg)! : null
-              const waves = p.isNew
-                ? 'None'
-                : [data.w1[p.id], data.w2[p.id], data.w3[p.id]].filter(Boolean).length + '×'
+            {rows.map(({ isNew, person }) => {
+              const id = person.id
+              const rec = isNew ? null : data.w2[id] ?? data.w3[id]
+              const seg = rec ? data.SEGS.find((g) => g.id === rec.seg)! : null
+              const n = isNew ? 0 : [data.w1[id], data.w2[id], data.w3[id]].filter(Boolean).length
+              const last = isNew ? null : data.w2[id] ?? data.w3[id] ?? data.w1[id]
+
+              // Three states, three colours: never assessed is a gap worth chasing
+              // (rust), an import with no baseline is pending (gold), a real history
+              // is just information (muted).
+              const assessment = isNew
+                ? { text: 'NO BASELINE', color: 'var(--color-gold)' }
+                : n
+                  ? { text: `ASSESSED ${n}\u00d7 \u00b7 LAST ${last!.at.toUpperCase()}`, color: 'rgba(20,40,60,.55)' }
+                  : { text: 'NEVER ASSESSED', color: 'var(--color-rust)' }
+
               return (
-                <div key={p.id} className={`grid items-center gap-3 border-b border-ink/6 p-[11px_18px] text-[12px] text-ink/70 hover:bg-cream ${GRID}`}>
+                <div
+                  key={id}
+                  onClick={() => n > 0 && router.push(`/students/profile?id=${id}`)}
+                  className={`grid items-center gap-3 border-b border-ink/6 p-[11px_18px] text-[12px] text-ink/70 hover:bg-cream ${n > 0 ? 'cursor-pointer' : ''} ${GRID}`}
+                >
                   <div className="flex items-center gap-2 font-bold text-ink">
-                    {p.isNew && (
+                    {isNew && (
                       <span className="eyebrow rounded-[3px] bg-teal/12 px-1.5 py-0.5 text-[8px] tracking-[.1em] text-teal">
                         NEW
                       </span>
                     )}
-                    <span className="truncate">{p.name}</span>
+                    <span className="truncate">{person.name}</span>
                   </div>
-                  <div className="truncate font-mono text-[10.5px] text-ink/50">{p.email}</div>
-                  <div>{p.faculty}</div>
-                  <div className="font-mono text-[11px]">{p.intakeYear}</div>
-                  <div className="font-mono text-[11px] text-ink/60">{waves}</div>
+                  <div className="truncate font-mono text-[10.5px] text-ink/50">{person.email}</div>
+                  <div>{person.faculty || '\u2014'}</div>
+                  <div className="font-mono text-[11px]">{person.intakeYear || '\u2014'}</div>
+                  <div className="font-mono text-[10px] leading-none" style={{ color: assessment.color }}>
+                    {assessment.text}
+                  </div>
                   <div className="flex items-center gap-2">
                     {seg ? (
                       <>
@@ -214,26 +281,21 @@ export default function PeoplePage() {
                         <span className="truncate">{seg.name}</span>
                       </>
                     ) : (
-                      <span className="text-ink/35">Not yet assessed</span>
+                      <span className="text-ink/35">{'\u2014'}</span>
                     )}
                   </div>
-                  <div className="text-right">
-                    {p.isNew ? (
-                      <Link href="/campaigns/new" className="text-[11px] leading-none font-bold text-teal hover:underline">
-                        Invite
-                      </Link>
-                    ) : (
-                      <Link href={`/students/profile?id=${p.id}`} className="text-[11px] leading-none font-bold text-teal hover:underline">
-                        View
-                      </Link>
-                    )}
-                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); openInvite(person.email) }}
+                    className="cursor-pointer text-right text-[11px] leading-none font-bold text-teal hover:underline"
+                  >
+                    Invite
+                  </button>
                 </div>
               )
             })}
           </div>
-          <div className="eyebrow flex-none border-t border-ink/8 p-[12px_18px] text-[10.5px] tracking-normal text-ink/45">
-            SHOWING {rows.length} OF {everyone.length}
+          <div className="flex-none border-t border-ink/8 p-[12px_18px] text-[11.5px] leading-none text-ink/45">
+            {more}
           </div>
         </section>
       </div>

@@ -36,12 +36,17 @@ export interface Template {
 
 export type TemplateKind = 'invite' | 'reminder' | 'thanks'
 
+/*
+ * Verbatim from the design project. {{test_name}} resolves to "the KYKOLOGY 6D
+ * Profile" — article included — so the copy must not supply its own "the", or
+ * the preview reads "running the the KYKOLOGY 6D Profile".
+ */
 const DEFAULT_TEMPLATES: Record<TemplateKind, Template> = {
   invite: {
     subject: 'Your KYKOLOGY 6D Profile — 15 minutes, {{student_name}}',
     body: `Hi {{student_name}},
 
-Your faculty is running the {{test_name}} this term. It takes about 15 minutes and there are no right answers.
+Your faculty is running {{test_name}} this term. It takes about 15 minutes and there are no right answers.
 
 Your results are shared with your institution so we can point support and opportunities at the right people. You can see your own profile as soon as you finish.
 
@@ -53,19 +58,19 @@ Deadline: {{deadline}}
     subject: 'Still open: {{test_name}} closes {{deadline}}',
     body: `Hi {{student_name}},
 
-You haven't started the {{test_name}} yet. It takes about 15 minutes and it closes on {{deadline}}.
+You haven't started {{test_name}} yet. It's 15 minutes, and it closes on {{deadline}}.
 
-If you started and got interrupted, your link picks up where you left off.
+If you started and got interrupted, the link picks up where you left off.
 
 — Student Services`,
   },
   thanks: {
-    subject: 'Your 6D Profile is ready',
+    subject: 'Thanks, {{student_name}} — your profile is ready',
     body: `Hi {{student_name}},
 
-Thanks for completing the {{test_name}}. Your profile is ready to view.
+That's {{test_name}} done. Your profile is ready whenever you want to look at it.
 
-Nothing here is a verdict — it is a description of how you tend to operate, and it changes.
+Nothing here is a fixed label. Behaviour moves — this is a starting point for a conversation with your tutor.
 
 — Student Services`,
   },
@@ -78,7 +83,15 @@ interface DemoState {
   addCampaign: (c: Omit<NewCampaign, 'id'>) => string
   templates: Record<TemplateKind, Template>
   setTemplate: (kind: TemplateKind, next: Template) => void
-  resetTemplates: () => void
+  /**
+   * The invite modal is rendered once, in the header, but opened from two places:
+   * the header button and every row of the People directory (prefilled with that
+   * person's address). So its open state lives here rather than inside the modal.
+   */
+  invite: { open: boolean; email: string }
+  openInvite: (email?: string) => void
+  closeInvite: () => void
+  setInviteEmail: (email: string) => void
 }
 
 const Ctx = createContext<DemoState | null>(null)
@@ -87,6 +100,7 @@ export function DemoStateProvider({ children }: { children: React.ReactNode }) {
   const [newPeople, setNewPeople] = useState<NewPerson[]>([])
   const [newCampaigns, setNewCampaigns] = useState<NewCampaign[]>([])
   const [templates, setTemplates] = useState(DEFAULT_TEMPLATES)
+  const [invite, setInvite] = useState({ open: false, email: '' })
 
   const value = useMemo<DemoState>(
     () => ({
@@ -104,9 +118,12 @@ export function DemoStateProvider({ children }: { children: React.ReactNode }) {
       },
       templates,
       setTemplate: (kind, next) => setTemplates((prev) => ({ ...prev, [kind]: next })),
-      resetTemplates: () => setTemplates(DEFAULT_TEMPLATES),
+      invite,
+      openInvite: (email = '') => setInvite({ open: true, email }),
+      closeInvite: () => setInvite({ open: false, email: '' }),
+      setInviteEmail: (email) => setInvite((prev) => ({ ...prev, email })),
     }),
-    [newPeople, newCampaigns, templates],
+    [newPeople, newCampaigns, templates, invite],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

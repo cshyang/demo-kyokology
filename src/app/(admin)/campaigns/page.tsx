@@ -2,8 +2,8 @@
 
 import { Suspense, useMemo } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { Header, HeaderButton } from '@/components/Header'
+import { useSearchParams } from 'next/navigation'
+import { Header } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { campaignFunnel } from '@/lib/data/derive.ts'
 import { useDemoState } from '@/lib/demo-state'
@@ -22,7 +22,6 @@ function CreatedBanner() {
 
 export default function CampaignsPage() {
   const data = useDemoData()
-  const router = useRouter()
   const { newCampaigns } = useDemoState()
 
   const rows = useMemo(
@@ -36,29 +35,32 @@ export default function CampaignsPage() {
           pctCompleted: pct(f.completed),
           pctStartedOnly: pct(f.started - f.completed),
           pctOpenedOnly: pct(f.opened - f.started),
-          line: `${f.completed} completed · ${f.started - f.completed} mid-test · ${f.opened - f.started} opened only · ${f.bounced} bounced`,
+          line: `${f.completed} of ${f.sent} complete` + (f.bounced ? ` · ${f.bounced} bounced` : ''),
         }
       }),
     [data],
   )
 
   const live = rows.find((r) => r.c.status !== 'COMPLETE')
-  const noProgress = live ? live.f.sent - live.f.started : 0
+  // Delivered but never started. A bounce is not "no progress" — nothing arrived.
+  const noProgress = live ? live.f.sent - live.f.started - live.f.bounced : 0
+
+  const retestBounced = rows.find((r) => r.c.id === 'B')?.f.bounced ?? 0
 
   const alerts = [
     live && {
-      title: `${noProgress} students have made no progress`,
-      body: `${live.c.name} has been open since ${live.c.sentLabel}. The reminder rule fires at 5 days — ${noProgress} people qualify right now.`,
-      tint: 'rgba(166,80,63,.08)',
-      line: '#E2CDC6',
+      title: `${live.c.name} is on day 3`,
+      body: `${live.f.completed} of ${live.f.sent} have finished. ${noProgress} have made no progress at all — the reminder is one click away on the campaign.`,
+      tint: '#F9F4E9',
+      line: '#E4D6B6',
       href: `/campaigns/${live.c.id}`,
     },
     {
-      title: `${rows.reduce((a, r) => a + r.f.bounced, 0)} addresses bounced`,
-      body: 'Undeliverable invites are tracked as a status rather than dropped, so completion rates are not quietly inflated.',
-      tint: 'rgba(185,139,60,.08)',
-      line: '#E4D6B6',
-      href: live ? `/campaigns/${live.c.id}` : '/campaigns',
+      title: `${retestBounced} addresses bounced in the retest`,
+      body: 'Failed sends stay visible rather than being dropped, so the follow-up list stays honest.',
+      tint: '#F8F1EE',
+      line: '#E2CDC6',
+      href: '/campaigns/B',
     },
   ].filter(Boolean) as { title: string; body: string; tint: string; line: string; href: string }[]
 
@@ -66,9 +68,14 @@ export default function CampaignsPage() {
 
   return (
     <>
-      <Header title="Campaigns" sub={newCampaigns.length ? `${data.campaigns.length + newCampaigns.length} sends. ${newCampaigns.length} just created, one still in flight.` : 'Three sends. One is still in flight.'}>
-        <HeaderButton tone="solid" onClick={() => router.push('/campaigns/new')}>New campaign</HeaderButton>
-      </Header>
+      <Header
+        title="Campaigns"
+        sub={
+          newCampaigns.length
+            ? `${data.campaigns.length + newCampaigns.length} sends. ${newCampaigns.length} just created, one still in flight.`
+            : 'Three sends. One is still in flight.'
+        }
+      />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-[#FCFCFA] px-[26px] py-[22px]">
         <Suspense fallback={null}>
@@ -102,7 +109,7 @@ export default function CampaignsPage() {
                 <div className="eyebrow mt-1 text-[10px] tracking-normal text-ink/45">JUST CREATED · NOT DELIVERED</div>
               </div>
               <div className="text-[12px] leading-[1.3] text-ink/65">{c.audience}</div>
-              <div className="font-mono text-[11px] leading-none text-ink/60">{c.sentLabel}</div>
+              <div className="font-mono text-[11px] leading-none text-ink/60">{c.sentLabel.toUpperCase()}</div>
               <div>
                 <div className="flex h-[9px] overflow-hidden rounded-[5px] bg-line" />
                 <div className="mt-2 font-mono text-[10px] leading-none text-ink/50">
@@ -128,7 +135,7 @@ export default function CampaignsPage() {
                 <div className="eyebrow mt-1 text-[10px] tracking-normal text-ink/45">6D PROFILE · 36 QUESTIONS</div>
               </div>
               <div className="text-[12px] leading-[1.3] text-ink/65">{c.audience}</div>
-              <div className="font-mono text-[11px] leading-none text-ink/60">{c.sentLabel}</div>
+              <div className="font-mono text-[11px] leading-none text-ink/60">{c.sentLabel.toUpperCase()}</div>
               <div>
                 <div className="flex h-[9px] overflow-hidden rounded-[5px] bg-line">
                   <div className="bg-sage" style={{ width: `${pctCompleted}%` }} />

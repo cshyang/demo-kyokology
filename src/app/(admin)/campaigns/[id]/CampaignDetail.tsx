@@ -75,7 +75,7 @@ export function CampaignDetail({ id }: { id: string }) {
 
   return (
     <>
-      <Header title={campaign.name} sub={`${campaign.audience} · sent ${campaign.sentLabel} · ${campaign.status}`}>
+      <Header title={campaign.name} sub={`${campaign.audience} · SENT ${campaign.sentLabel} · ${campaign.status}`}>
         <Link href="/campaigns" className="rounded-md border border-ink/18 px-[13px] py-[9px] text-[11.5px] leading-none font-bold text-ink hover:bg-parchment">
           ← Back
         </Link>
