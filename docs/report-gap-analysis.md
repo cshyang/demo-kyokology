@@ -149,17 +149,17 @@ Ranked by leverage. `S` = student-facing, `A` = admin/staff-facing.
 
 | # | Addition | Who | Note |
 |---|---|---|---|
-| 1 | **Facet drill-down** — 6 bars per dimension, band chip, intra-dimension spread callout | S+A | The largest visual gap. Blocked on 1.1 and 1.3 |
-| 2 | **Pressure / Dynamic series** on the radar + per-dimension swing number | S+A | The report's most distinctive idea. Platform has nothing like it |
-| 3 | **Norm rail** — percentile vs faculty and vs university on every score | S+A | Data already exists. Cheapest high-value item here |
-| 4 | **Blind spot card** per dimension, with a staff "discuss / hold" flag | A first | Framing per 1.10 before this goes student-facing |
-| 5 | **Response-quality strip** — completion time, straight-line index, items skipped | A only | Answers "should I act on this?" |
+| 1 | **Facet drill-down** — 6 bars per dimension, band chip, intra-dimension spread callout | S+A | ✅ Built. 1.1 resolved by banding instead of scoring; 1.3 disclosed on the panel, not solved — see §9 |
+| 2 | **Pressure / Dynamic series** on the radar + per-dimension swing number | S+A | ✅ Built. The report's most distinctive idea. Platform had nothing like it |
+| 3 | **Norm rail** — percentile vs faculty and vs university on every score | S+A | ✅ Built. Data already existed. Cheapest high-value item here |
+| 4 | **Watch-outs** — rule-fired, replacing the report's per-dimension "Blind spot" | A first | ✅ Built. Renamed and rule-keyed per 1.4 and 1.10 — see §9 |
+| 5 | **Response-quality strip** — completion time, straight-line index, items skipped | A only | ✅ Built. Answers "should I act on this?" |
 | 6 | **Capability panel** — family, band, top capabilities, **evidence source per line** | S+A | Blocked on 1.4 |
 | 7 | **Contribution ranks** with the visible traceability chain | S+A | Keep the chain — it is the report's best trust device. Blocked on 1.2 |
 | 8 | **Opportunity arenas with attached institutional programmes** | S+A | Salvage the Segments action pattern |
-| 9 | **DEPTH reflection state** — staff sees *whether* and *when*, never *what* | split | Her written answers are private. This is a consent boundary, not a permission toggle |
-| 10 | **30-day plan + milestone evidence tracker** — week status, evidence logged, overdue | split | **The only thing on the profile that changes weekly.** It is the reason a counsellor opens the screen a second time |
-| 11 | **Report artefact panel** — generate this PDF from the profile, version history, shared-with log | A | Today the PDF and the platform are disconnected worlds |
+| 9 | **DEPTH reflection state** — staff sees *whether* and *when*, never *what* | split | ✅ Built. The written answers are private. This is a consent boundary, not a permission toggle |
+| 10 | **30-day plan + milestone evidence tracker** — week status, evidence logged, overdue | split | ✅ Built. **The only thing on the profile that changes weekly.** It is the reason a counsellor opens the screen a second time |
+| 11 | **Report artefact panel** — generate this PDF from the profile, version history, shared-with log | A | ✅ Built. The PDF and the platform were disconnected worlds |
 | 12 | Pronoun / preferred-name field | S | Feeds every generated sentence |
 
 Item 10 deserves emphasis. Everything else on the profile is static between assessments. The action plan and evidence tracker are the only weekly-changing surface, which makes them the difference between a screen that gets visited once and a screen that gets visited every fortnight.
@@ -252,12 +252,14 @@ That is a constraint, not a problem. It is also what makes the phasing below pos
 
 ---
 
-## 7. Two decisions that block design
+## 7. Four decisions that block design
 
-Neither is a build question. Both need KYKOLOGY to answer before any screen gets drawn.
+None is a build question. All four need KYKOLOGY to answer.
 
 1. **Is the evidence real?** (§1.4) — if yes, the platform needs an evidence-capture surface and that changes the profile's information architecture. If no, the capabilities section is inference and must be labelled as such.
 2. **Does Shadow exist?** (§1.7) — if yes, it is a third data layer with its own consent model. If no, delete the footnote.
+3. **Whose facet taxonomy wins?** (§1.3, §9) — either the item bank gets rewritten to the report's 36 facet names, or the report adopts the constructs the bank actually measures. Until one happens, every facet band on Egocentricity is a label the instrument cannot support.
+4. **Is the pressure model directional or regressive?** (§9) — does Security rise for everyone under pressure, or does each profile compress toward its own centre? The two disagree for about half the cohort.
 
 ---
 
@@ -301,7 +303,19 @@ Bands are now cut on cohort percentile instead. This also collapses two recommen
 
 **"Blind spot" is now "worth watching," and it fires on rules.** The report prints one under every dimension whether or not there is anything to say. Generating that prose from the derived facet split would have reproduced §1.4's overclaiming in code — a clinical-sounding sentence whose provenance is a hash of the student ID. Each watch-out is now keyed to something measured: a percentile spread, a pressure swing, a change between two sittings. When no rule fires the panel says so, because an empty panel is a result. The rename is §1.10: a boxed callout headed "Blind spot" reads as a diagnosis no matter what the footer says.
 
+**§1.3 is disclosed on the screen, not solved — and it cannot be solved here.** The facet drill-down puts the report's facet names over this platform's item bank, which §1.3 established are different constructs. Rendered, that produced an S0119 Egocentricity panel reading `Power & Authority — VERY STRONG`, `Image, Status & Fame — VERY STRONG`, off items asking *"I keep track of what I am owed"* and *"Criticism stays with me for a while afterwards."* A band is a claim about a named person, and that one is not supportable.
+
+Rewriting the item bank is out of scope for a demo, so the panel now names the mismatch wherever it exists — on Egocentricity, and on the four facets across Complexity, Self-Actualisation and Spirituality that have no item behind them at all. **This is the item on the list that most needs KYKOLOGY to decide something**, and the disclosure is a holding position, not a fix.
+
 One thing also changed on the way in. Re-assessment is **not** the last stage of the post-assessment funnel, though it was planned as one: 291 students hold two assessments, which is *more* than have opened a report, because re-assessment is something the university scheduled rather than something a student chose. As a funnel stage it drew a bar longer than the ones above it and read as a bug. It sits beside the funnel instead.
+
+### An open question the PDF cannot settle
+
+The pressure series is implemented as regression toward the student's own centre — tall signals compress, quiet ones reach up. That reproduces NurAin's profile exactly: her Security is low and rises sharply, her Spirituality barely moves.
+
+But the report's stated *mechanism* is directional, not regressive — *"she looks for more structure and certainty in a less controlled situation."* Under a directional rule, Security rises for everyone. Under the regressive one, a student who is already high on Security sees it **fall** under pressure. S0119 is exactly that case: −11 points, and the watch-out tells staff they have less security available than the natural pattern suggests.
+
+NurAin's single profile is consistent with both theories, so the PDF cannot discriminate them. Roughly half the cohort currently gets the opposite of what a directional model would predict. **Ask KYKOLOGY which one they mean** — it is a one-line change either way, and it is a question about their model, not about this code.
 
 ---
 

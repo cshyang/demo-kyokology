@@ -67,6 +67,35 @@ test('no band swallows the cohort', () => {
   }
 })
 
+/**
+ * Facets are ranked against the dimension population, but they carry the split's
+ * spread on top of the population's, so they sit wider than the scores they are
+ * read against and drift toward the tails. Measured at ~2.5 points at each end,
+ * which is mild enough to leave alone. This fails if it ever stops being mild.
+ */
+test('facet bands stay close to the dimension bands they are read against', () => {
+  const dim: Record<string, number> = {}, fac: Record<string, number> = {}
+  let nd = 0, nf = 0
+  for (const t of data.T) {
+    const pop = assessed.map((st) => latest(data, st.id)!.sc[t]).sort((a, b) => a - b)
+    for (const st of assessed) {
+      const score = latest(data, st.id)!.sc[t]
+      const b = bandOf(percentileOf(score, pop))
+      dim[b.id] = (dim[b.id] ?? 0) + 1
+      nd++
+      for (const v of facetValues(st.id, t, score)) {
+        const fb = bandOf(percentileOf(v, pop))
+        fac[fb.id] = (fac[fb.id] ?? 0) + 1
+        nf++
+      }
+    }
+  }
+  for (const b of BANDS) {
+    const drift = Math.abs((fac[b.id] ?? 0) / nf - (dim[b.id] ?? 0) / nd)
+    assert.ok(drift <= 0.06, `${b.label} drifts ${(drift * 100).toFixed(1)} points between facet and dimension`)
+  }
+})
+
 test('pressure compresses the profile toward its own centre', () => {
   const spread = (sc: Record<string, number>) => {
     const vals = data.T.map((t) => sc[t])

@@ -47,6 +47,23 @@ interface TraitView {
 }
 
 /**
+ * Where the facet names and the item bank do not yet describe the same thing.
+ *
+ * The facet names come from the printed report's taxonomy; the scores under them
+ * come from this platform's 36 items, and on these four dimensions the two were
+ * written against different constructs. Saying so on the screen is the point —
+ * a band is a claim about a named person, and a reader is entitled to know which
+ * of these claims the instrument can currently support.
+ * See docs/report-gap-analysis.md §1.3.
+ */
+const UNMAPPED: Partial<Record<Dim, string>> = {
+  e: 'The report reads Egocentricity as agency — persistence, authority, taking charge. This platform’s six items read it as grievance: keeping score, letting a slight go, sitting with criticism. A high band here does not yet mean what the facet name says.',
+  c: 'No item in the bank asks about persuasion, so Inspiring & Influencing is carried by items about ambiguity and pattern-finding.',
+  sa: 'No item asks about ethics or formal reasoning; those two facets ride on the rest of the dimension.',
+  sp: 'The bank is deliberately secular. Faith & Higher Power and Meaning, Existence & Afterlife have no item behind them.',
+}
+
+/**
  * One dimension, with its six facets folded away underneath it.
  *
  * The dimension score is printed because six items stand behind it. The facets
@@ -109,6 +126,12 @@ export function DimensionCard({ d, t }: { d: DimView; t: TraitView }) {
           <p className="mt-2 text-[10px] leading-[1.55] text-ink/45">
             Banded, not scored — one item each. Two facets in the same band are not separable.
           </p>
+          {UNMAPPED[d.dim] ? (
+            <p className="mt-1.5 rounded-[5px] bg-vellum p-[7px_9px] text-[10px] leading-[1.55] text-ink/60">
+              <strong className="font-bold text-ink">Names ahead of items.</strong> {UNMAPPED[d.dim]} These bands
+              are provisional until the bank is written to match.
+            </p>
+          ) : null}
         </div>
       ) : null}
     </div>
