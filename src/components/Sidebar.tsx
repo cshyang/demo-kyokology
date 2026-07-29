@@ -77,7 +77,10 @@ interface NavItem {
   href: string
   label: string
   Icon: () => React.ReactElement
-  /** Route prefixes that also light this item up. A student profile belongs to People. */
+  /**
+   * Route prefixes that also light this item up. A student profile lives under
+   * /students/ but belongs to People — that is the only way into it.
+   */
   also?: string[]
 }
 

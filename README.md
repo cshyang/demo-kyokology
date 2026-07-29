@@ -45,7 +45,7 @@ while the code still looks correct.
 |---|---|
 | `/overview` | KPIs, five October checkpoints, fingerprint bars, activity, population waffle |
 | `/fingerprint` | Six-axis radar, faculty separation, archetype distribution |
-| `/segments` | **The hero.** Seven trait-rule buckets with attached actions, plus the roster |
+| `/segments` | **The hero.** Six flagged patterns with attached actions, plus the roster |
 | `/longitudinal` | Dimension movement, the "22 of 55 moved out" headline, pattern migration |
 | `/students/profile?id=` | The individual profile with calibration scatter, reached from People |
 | `/campaigns` · `/campaigns/[id]` | Funnel tracking and the nudge flow |

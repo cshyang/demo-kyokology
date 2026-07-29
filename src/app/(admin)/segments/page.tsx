@@ -41,14 +41,25 @@ export default function SegmentsPage() {
   const flagged = total - counts.steady - counts.unflagged
   const steadyPct = Math.round((counts.steady / (total || 1)) * 100)
   const sumLine = `${data.SEGS.map((s) => counts[s.id]).join(' + ')} = ${total}`
-  const w2n = Object.keys(data.w2).length
-  const w3n = Object.keys(data.w3).length
-  const denom =
-    filter.wave === 'latest'
-      ? `${w2n} from B + ${w3n} from C`
-      : filter.wave === 'w1'
-        ? 'Campaign A · Oct 2025'
-        : 'Campaign B · Oct 2026'
+  /**
+   * Where the students on screen came from.
+   *
+   * The design keys this off the wave selector alone, so it kept reading
+   * "291 from B + 78 from C" under a filter showing nineteen people. It counts
+   * the filtered set instead — same sentence when nothing is filtered, honest
+   * when something is.
+   */
+  const denom = useMemo(() => {
+    if (filter.wave === 'w1') return `${recs.length} from Campaign A · Oct 2025`
+    if (filter.wave === 'w2') return `${recs.length} from Campaign B · Oct 2026`
+    // 'latest' takes w2 first and falls back to w3, so the record's source is
+    // whichever of the two that student actually has.
+    const fromB = recs.filter((r) => data.w2[r.st.id]).length
+    const fromC = recs.length - fromB
+    // A filter can empty one side — the 2026 intake has no baseline, so it is all
+    // C. "0 from B + 78 from C" is accurate but reads like a bug; drop the term.
+    return [fromB && `${fromB} from B`, fromC && `${fromC} from C`].filter(Boolean).join(' + ') || 'nobody'
+  }, [data, recs, filter.wave])
 
   const lead =
     `${flagged} of ${total} assessed students match a flagged pattern — ` +
