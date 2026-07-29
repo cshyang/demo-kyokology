@@ -8,6 +8,7 @@ import { useDemoData } from '@/lib/data/demo.ts'
 import {
   campaignFunnel, checkpoints, dimMeans, movers, segmentTally, waffleCells, wafflePath,
 } from '@/lib/data/derive.ts'
+import { postFunnel, qualityRollup } from '@/lib/data/layers.ts'
 
 const ACTIVITY = [
   { when: '28 OCT 2026', lead: '96 invites unanswered after 5 days', rest: ' · reminder rule fired · Oct 2026 mid-flight', href: '/campaigns/C' },
@@ -98,8 +99,30 @@ export default function OverviewPage() {
       spx, spy, wCats, cells, paths,
       waffleH: Math.ceil(ci / 10) * 15 - 3,
       topMovers: movers(data).slice(0, 3),
+      post: postFunnel(data),
+      quality: qualityRollup(data),
     }
   }, [data])
+
+  /**
+   * The campaign funnel stops at "completed", which measures whether the
+   * instrument was filled in — not whether it changed anything. These are the
+   * stages after it, and each one is a subset of the one above.
+   *
+   * Re-assessment is deliberately NOT in this list. 291 students hold two
+   * completed assessments, which is more than have opened their report — because
+   * being re-assessed is something the university did to them, not something
+   * they chose after reading anything. Putting it at the bottom of a funnel
+   * makes the last bar longer than the ones above it and reads as a bug. It sits
+   * beside the funnel instead, which is also where it belongs conceptually.
+   */
+  const postStages = [
+    { label: 'COMPLETED', n: v.post.completed, tone: '#14283C' },
+    { label: 'REPORT OPENED', n: v.post.reportOpened, tone: '#2F4A63' },
+    { label: 'REFLECTION STARTED', n: v.post.depthStarted, tone: '#1E6F63' },
+    { label: 'PLAN STARTED', n: v.post.planStarted, tone: '#5E8F80' },
+    { label: 'EVIDENCE LOGGED', n: v.post.evidenced, tone: '#B98B3C' },
+  ]
 
   const kpis = [
     { label: 'ON RECORD', v: v.onRecord, sub: '4 faculties · 3 intakes', href: '/people', top: 'rgba(20,40,60,.10)', color: '#14283C' },
@@ -167,6 +190,59 @@ export default function OverviewPage() {
               </svg>
               <p className="mt-2.5 text-[11px] leading-[1.5] text-ink/55">
                 {v.ses[0].toFixed(1)} in 2022 → {v.ses[4].toFixed(1)} now — drifting down as intakes broaden.
+              </p>
+            </div>
+          </Panel>
+
+          <Panel className="flex flex-wrap items-stretch gap-7">
+            <div className="min-w-[420px] flex-1">
+              <div className="flex items-baseline gap-2.5">
+                <CardTitle>After the assessment</CardTitle>
+                <span className="eyebrow text-[10px] tracking-normal text-ink/45">
+                  WHERE THE CAMPAIGN FUNNEL STOPS
+                </span>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-[1.4] text-ink/50">
+                Completion measures whether the instrument was filled in. These stages measure whether it did
+                anything.
+              </p>
+              <div className="mt-4 flex flex-col gap-2.5">
+                {postStages.map((s) => (
+                  <div key={s.label} className="flex items-center gap-2.5">
+                    <div className="eyebrow w-[124px] flex-none text-[9px] tracking-[.1em] text-ink/55">{s.label}</div>
+                    <div className="h-2 min-w-[120px] flex-1 rounded-[4px] bg-parchment">
+                      <div
+                        className="h-full rounded-[4px]"
+                        style={{ width: `${(s.n / v.post.completed) * 100}%`, background: s.tone }}
+                      />
+                    </div>
+                    <div className="w-8 flex-none text-right font-mono text-[11px] leading-none font-bold text-ink">
+                      {s.n}
+                    </div>
+                    <div className="w-9 flex-none text-right font-mono text-[10px] leading-none text-ink/45">
+                      {Math.round((s.n / v.post.completed) * 100)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3.5 border-t border-ink/8 pt-3 text-[11px] leading-[1.55] text-ink/50">
+                Separately, <strong className="font-bold text-ink">{v.post.reassessed}</strong> students hold two
+                completed assessments — more than have opened a report, because re-assessment is something the
+                university scheduled rather than something a student chose. It is the population Longitudinal
+                is built on.
+              </p>
+            </div>
+            <div className="flex w-[210px] flex-none flex-col justify-center border-l border-ink/8 pl-6">
+              <div className="eyebrow text-[9px] tracking-[.14em] text-ink/45">WORTH ACTING ON</div>
+              <div className="mt-3 text-[30px] leading-none font-black tracking-[-.02em] tabular-nums text-ink">
+                {v.quality.n - v.quality.review}
+              </div>
+              <div className="mt-2 text-[11px] leading-[1.4] text-ink/50">
+                of {v.quality.n} assessed profiles pass the response-quality check
+              </div>
+              <p className="mt-3.5 border-t border-ink/8 pt-3 text-[11px] leading-[1.55] text-ink/55">
+                {v.quality.review} sat too fast, straight-lined a long run, or left items blank. Median sitting
+                is {v.quality.medianMinutes} minutes.
               </p>
             </div>
           </Panel>
