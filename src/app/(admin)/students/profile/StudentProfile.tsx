@@ -4,7 +4,11 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { dimMeans, latest } from '@/lib/data/derive.ts'
+import { profileLayers } from '@/lib/data/layers.ts'
 import type { Dim, SegmentId, WaveResult } from '@/lib/data/generator.ts'
+import {
+  DimensionCard, PressurePanel, QualityPanel, ReflectionPanel, ReportPanel, WatchOuts,
+} from './ProfileLayers.tsx'
 
 /** The two dimensions each rule actually constrains — the axes worth plotting. */
 const RULE_AXES: Record<SegmentId, { x: Dim; y: Dim; label: string }> = {
@@ -83,7 +87,9 @@ export function StudentProfile({ id }: { id: string }) {
         me: o.s.id === st.id,
       }))
 
-    return { waves, idx, cur, prev, traits, seg, assessedN, axes, cloud, uniMeans }
+    const layers = cur ? profileLayers(data, st, cur.rec, prev?.rec ?? null) : null
+
+    return { waves, idx, cur, prev, traits, seg, assessedN, axes, cloud, uniMeans, layers }
   }, [data, st, waveIdx, plotSeg])
 
   if (!st || !v || !v.cur) {
@@ -144,35 +150,43 @@ export function StudentProfile({ id }: { id: string }) {
 
         <Section title="THE SIX DIMENSIONS">
           <div className="mt-3 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(240px,1fr))]">
-            {v.traits.map((t) => (
-              <div key={t.key} className="rounded-[9px] border border-ink/10 bg-white p-[14px_16px]">
-                <div className="flex items-baseline gap-2">
-                  <span className="eyebrow flex-1 text-[9px] tracking-[.12em] text-ink/50">{t.label}</span>
-                  <span className="text-[17px] leading-none font-bold tabular-nums text-ink">{t.v}</span>
-                  <span className="font-mono text-[10.5px] leading-none" style={{ color: t.deltaColor }}>
-                    {t.delta}
-                  </span>
-                </div>
-                {t.hasDelta ? (
-                  <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="mt-2.5 h-9 w-full">
-                    <line x1="0" x2="100" y1={t.meanY} y2={t.meanY} stroke="rgba(20,40,60,.18)" strokeWidth={1} strokeDasharray="3 3" />
-                    <polyline points={t.points} fill="none" stroke="#14283C" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" opacity={0.8} />
-                    <circle cx={t.lastX} cy={t.lastY} r={3.2} fill="#fff" stroke="#14283C" strokeWidth={2} />
-                  </svg>
-                ) : (
-                  <div className="mt-2.5 h-9">
-                    <div className="mt-3 h-[6px] overflow-hidden rounded-[3px] bg-line">
-                      <div className="h-full rounded-[3px] bg-slate" style={{ width: `${t.v}%` }} />
-                    </div>
-                  </div>
-                )}
-              </div>
+            {v.layers!.dims.map((d, i) => (
+              <DimensionCard key={d.dim} d={d} t={v.traits[i]} />
             ))}
           </div>
-          <p className="mt-3 text-[11.5px] leading-[1.6] text-ink/50">
+          <p className="mt-3 max-w-[68ch] text-[11.5px] leading-[1.6] text-ink/50">
             Change is against the previous assessment; the dashed line is the university mean of {v.assessedN} assessed
-            students.
+            students. Bands are cut against that same cohort rather than against the scale — STRONG means higher
+            than most of this university, not 80% of the way up a number line.
           </p>
+        </Section>
+
+        <Section title="UNDER PRESSURE">
+          <p className="mt-2.5 max-w-[68ch] text-[13px] leading-[1.7] text-ink/70">
+            The same six dimensions when a situation stops being comfortable — deadlines, unfamiliar rooms,
+            work that matters. Every dimension is pulled toward this profile&rsquo;s own centre by how far that
+            dimension is known to travel, so the pressure shape is derived from {st.name}&rsquo;s scores rather
+            than measured separately.
+          </p>
+          <PressurePanel
+            dims={v.layers!.dims}
+            pressure={v.layers!.pressure}
+            swing={v.layers!.swing}
+            T={data.T}
+            SHORT={data.SHORT}
+          />
+        </Section>
+
+        <Section title="WORTH WATCHING">
+          <WatchOuts items={v.layers!.watchOuts} name={st.name} />
+        </Section>
+
+        <Section title="AFTER THE ASSESSMENT">
+          <p className="mt-2.5 max-w-[68ch] text-[13px] leading-[1.7] text-ink/70">
+            Completing the instrument is the start of the work, not the end of it. This is how far {st.name} has
+            carried it since.
+          </p>
+          <ReflectionPanel e={v.layers!.engagement} name={st.name} />
         </Section>
 
         <Section title="CALIBRATION">
@@ -249,6 +263,16 @@ export function StudentProfile({ id }: { id: string }) {
         </Section>
 
         <div className="mt-6 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
+          <QualityPanel q={v.layers!.quality} />
+          <ReportPanel
+            e={v.layers!.engagement}
+            name={st.name}
+            date={v.cur.date}
+            waves={v.waves.map((w) => ({ n: w.n, date: w.date }))}
+          />
+        </div>
+
+        <div className="mt-4 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
           <div className="rounded-[9px] border border-ink/10 bg-white p-[16px_18px]">
             <div className="eyebrow text-[8.5px] tracking-[.14em] text-ink/45">COMMUNICATION HISTORY</div>
             <div className="mt-2.5">
