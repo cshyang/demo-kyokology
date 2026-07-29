@@ -1,0 +1,71 @@
+@import 'tailwindcss';
+
+/*
+ * KYKOLOGY design tokens.
+ * Extracted from the Claude Design prototype (`Kykology 6D Admin.dc.html`).
+ *
+ * The prototype used rgba(20,40,60,α) at twelve alphas — .06/.08/.10 for rules,
+ * .16/.18 for borders and shadows, .42–.70 for text. Those are not twelve
+ * colours; they are one colour at twelve opacities. So there is a single `ink`
+ * token and the alpha is expressed at the call site: text-ink/45, border-ink/10,
+ * bg-ink/6. Nothing is collapsed and nothing is invented.
+ *
+ * Light mode only, per the design spec. Do not add a dark variant.
+ */
+@theme {
+  /* Core */
+  --color-ink: #14283c; /* navy — text, sidebar, every alpha ramp above */
+  --color-cream: #fafaf7; /* page surface */
+  --color-line: #edece8; /* solid hairline where a tint won't do */
+
+  /* Accents — these double as the segment palette */
+  --color-teal: #1e6f63; /* action, links, Silent Contributors */
+  --color-rust: #a6503f; /* alert, Driven Under-Regulated */
+  --color-gold: #b98b3c; /* warn, Under-stretched Explorers */
+  --color-sky: #6e96bf; /* Transition Fragile */
+  --color-slate: #2f4a63; /* Purpose Adrift */
+  --color-sage: #5e8f80; /* positive, Steady Core */
+  --color-stone: #8a8f94; /* Unflagged, deliberately inert */
+
+  /* Supporting surfaces lifted verbatim from the prototype */
+  --color-brass: #c9a24b;
+  --color-parchment: #f3f1ec;
+  --color-parchment-2: #f2f1ed;
+  --color-bone: #d3d1ca;
+  --color-vellum: #f9f4e9;
+
+  /* Type */
+  --font-display: Lora, Georgia, serif;
+  --font-sans: Lato, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Frame */
+  --spacing-sidebar: 216px;
+  --spacing-sidebar-collapsed: 64px;
+  --spacing-header: 70px;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #fff;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-teal);
+}
+a:hover {
+  color: var(--color-ink);
+}
+
+/* Small-caps mono eyebrow — used on nearly every panel in the prototype. */
+@utility eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
