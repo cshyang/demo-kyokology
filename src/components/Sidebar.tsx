@@ -52,6 +52,14 @@ const LongitudinalIcon = () => (
     <circle cx="14.5" cy="3.5" r="1.3" fill="currentColor" stroke="none" />
   </svg>
 )
+const ReadinessIcon = () => (
+  <svg viewBox="0 0 16 16" className={ICON} {...stroke}>
+    <path d="M1.5 13.8h13" />
+    <rect x="2.6" y="9.2" width="2.9" height="4.6" rx=".6" />
+    <rect x="6.55" y="6" width="2.9" height="7.8" rx=".6" />
+    <rect x="10.5" y="2.8" width="2.9" height="11" rx=".6" />
+  </svg>
+)
 const CampaignsIcon = () => (
   <svg viewBox="0 0 16 16" className={ICON} {...stroke}>
     <path d="M1.5 3.5h13v9h-13z" />
@@ -88,6 +96,7 @@ const OVERVIEW: NavItem = { href: '/overview', label: 'Overview', Icon: Overview
 const INSIGHTS: NavItem[] = [
   { href: '/fingerprint', label: 'Fingerprint', Icon: FingerprintIcon },
   { href: '/segments', label: 'Segments', Icon: SegmentsIcon },
+  { href: '/readiness', label: 'Readiness', Icon: ReadinessIcon },
   { href: '/longitudinal', label: 'Longitudinal', Icon: LongitudinalIcon },
 ]
 const OPERATE: NavItem[] = [
