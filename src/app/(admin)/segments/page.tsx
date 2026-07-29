@@ -7,6 +7,7 @@ import { CohortFilters } from '@/components/CohortFilters'
 import { useDemoData, SEGMENT_META, toCsv } from '@/lib/data/demo.ts'
 import { selectRecords, type CohortFilter } from '@/lib/data/derive.ts'
 import type { SegmentId } from '@/lib/data/generator.ts'
+import { tint } from '@/lib/color'
 
 /**
  * The hero screen.
@@ -120,7 +121,7 @@ export default function SegmentsPage() {
                   style={{
                     boxShadow: active
                       ? `inset 0 0 0 2px ${seg.color}`
-                      : 'inset 0 0 0 1px rgba(20,40,60,.12)',
+                      : `inset 0 0 0 1px ${tint('ink', 12)}`,
                   }}
                 >
                   <div className="flex items-start gap-2.5">

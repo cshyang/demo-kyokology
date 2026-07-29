@@ -2,37 +2,60 @@
 
 /*
  * KYKOLOGY design tokens.
- * Extracted from the Claude Design prototype (`Kykology 6D Admin.dc.html`).
+ * Extracted from the Claude Design prototype (`Kykology 6D Admin.dc.html`),
+ * then reconciled against the KYKOLOGY print palette — see the two groups below.
  *
- * The prototype used rgba(20,40,60,α) at twelve alphas — .06/.08/.10 for rules,
+ * The prototype used one navy at twelve alphas — .06/.08/.10 for rules,
  * .16/.18 for borders and shadows, .42–.70 for text. Those are not twelve
  * colours; they are one colour at twelve opacities. So there is a single `ink`
  * token and the alpha is expressed at the call site: text-ink/45, border-ink/10,
  * bg-ink/6. Nothing is collapsed and nothing is invented.
  *
+ * Inline styles can't use those utilities, so they take the same alpha through
+ * `tint()` in lib/color.ts. Both routes resolve to --color-ink, which is the
+ * point: the prototype's literal rgba(20,40,60,α) was a *copy* of the navy, so
+ * it silently kept the old value when the token moved to the brand's.
+ *
  * Light mode only, per the design spec. Do not add a dark variant.
  */
 @theme {
-  /* Core */
-  --color-ink: #14283c; /* navy — text, sidebar, every alpha ramp above */
-  --color-cream: #fafaf7; /* page surface */
+  /*
+   * ── Brand ────────────────────────────────────────────────────────────────
+   * Exact matches to the KYKOLOGY print palette (the one carrying CMYK and
+   * Pantone). These two are the colours a reader actually recognises as the
+   * brand — the sidebar and every link/action — so they are locked. Changing
+   * them puts the product out of step with the printed report.
+   */
+  --color-ink: #0b1f3a; /* Midnight Leadership Blue · Pantone 2965 C */
+  --color-teal: #006d77; /* Deep Teal · Pantone 7717 C — action, links */
+
+  /*
+   * ── Product ──────────────────────────────────────────────────────────────
+   * The print palette is six chromatics, three of which sit at L75–79 and
+   * land under 2:1 on cream — fills only, no text, no 1px strokes. It also
+   * has no alert colour at all. So it cannot encode seven segments or carry a
+   * dense text hierarchy, and these tokens fill the gaps it leaves.
+   *
+   * Where a token is close to a brand swatch but deliberately not it, the
+   * brand value is noted so the drift stays intentional rather than forgotten.
+   */
+  --color-cream: #fafaf7; /* page surface — warm; brand Light Gray #F2F2F2 is neutral */
   --color-line: #edece8; /* solid hairline where a tint won't do */
 
-  /* Accents — these double as the segment palette */
-  --color-teal: #1e6f63; /* action, links, Silent Contributors */
-  --color-rust: #a6503f; /* alert, Driven Under-Regulated */
-  --color-gold: #b98b3c; /* warn, Under-stretched Explorers */
-  --color-sky: #6e96bf; /* Transition Fragile */
-  --color-slate: #2f4a63; /* Purpose Adrift */
-  --color-sage: #5e8f80; /* positive, Steady Core */
-  --color-stone: #8a8f94; /* Unflagged, deliberately inert */
+  /* Accents — these double as the segment palette (see lib/data/generator.ts) */
+  --color-rust: #a6503f; /* alert, Driven Under-Regulated — brand has no alert colour */
+  --color-gold: #b98b3c; /* warn, Under-stretched Explorers — held; Heritage Gold #C98A00 is C69, too loud beside these mutes */
+  --color-sky: #6e96bf; /* Transition Fragile — held; Light Blue #8FCBFF is 1.65:1, fill-only */
+  --color-slate: #2f4a63; /* Purpose Adrift — brand jumps L12→L79 with nothing between */
+  --color-sage: #5e8f80; /* positive, Steady Core — held; Soft Teal #83C5BE is 1.88:1, breaks text-sage */
+  --color-stone: #8a8f94; /* Unflagged, deliberately inert — near brand Medium Gray #9E9E9E */
 
   /* Supporting surfaces lifted verbatim from the prototype */
-  --color-brass: #c9a24b;
+  --color-brass: #c9a24b; /* held; Soft Gold #D8BC7C is 1.76:1, breaks the sidebar rail */
   --color-parchment: #f3f1ec;
   --color-parchment-2: #f2f1ed;
   --color-bone: #d3d1ca;
-  --color-vellum: #f9f4e9;
+  --color-vellum: #f9f4e9; /* near brand Beige #F5EBD7 */
 
   /* Type */
   --font-display: Lora, Georgia, serif;

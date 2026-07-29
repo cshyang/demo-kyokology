@@ -23,6 +23,7 @@
 
 import { DIMS, type Campaign, type DemoData, type Dim, type Scores, type Student, type WaveResult } from './generator.ts'
 import { latest } from './derive.ts'
+import { tint, token } from '../color.ts'
 
 /** The report's 36 facet names, six per dimension, in T order. */
 export const FACETS: Record<Dim, readonly string[]> = {
@@ -95,11 +96,11 @@ export const k7d = (d: number) => (d > 0 ? '+' : d < 0 ? '−' : '') + (Math.abs
 export type BandName = 'LOW' | 'DEVELOPING' | 'MODERATE' | 'STRONG' | 'VERY STRONG'
 
 const BAND_COLOR: Record<BandName, string> = {
-  LOW: '#8A8F94',
-  DEVELOPING: '#6E96BF',
-  MODERATE: '#B98B3C',
-  STRONG: '#1E6F63',
-  'VERY STRONG': '#14283C',
+  LOW: token('stone'),
+  DEVELOPING: token('sky'),
+  MODERATE: token('gold'),
+  STRONG: token('teal'),
+  'VERY STRONG': token('ink'),
 }
 
 /** The five magnitude bands, as printed. Facet-level vocabulary. */
@@ -120,7 +121,7 @@ export function kmag(s: number): 'HIGH' | 'MEDIUM' | 'LOW' {
 }
 export function kmagC(s: number): string {
   const m = kmag(s)
-  return m === 'HIGH' ? '#1E6F63' : m === 'MEDIUM' ? '#B98B3C' : '#6E96BF'
+  return m === 'HIGH' ? token('teal') : m === 'MEDIUM' ? token('gold') : token('sky')
 }
 
 export const MAG_LEGEND: { t: BandName; r: string; c: string }[] = [
@@ -543,10 +544,10 @@ export function profileLayers(
       mag: kmag(v),
       magC: kmagC(v),
       delta: dv === null ? '' : k7d(dv),
-      deltaC: dv === null ? 'transparent' : dv > 0 ? '#1E6F63' : dv < 0 ? '#A6503F' : 'rgba(20,40,60,.4)',
+      deltaC: dv === null ? 'transparent' : dv > 0 ? token('teal') : dv < 0 ? token('rust') : tint('ink', 40),
       hasDelta: dv !== null,
       dynPct: Math.max(3, Math.min(97, v + dy)),
-      dynC: dy > 0 ? '#B98B3C' : dy < 0 ? '#6E96BF' : 'rgba(20,40,60,.28)',
+      dynC: dy > 0 ? token('gold') : dy < 0 ? token('sky') : tint('ink', 28),
       dynLabel:
         Math.abs(dy) < 3
           ? 'HOLDS STEADY'

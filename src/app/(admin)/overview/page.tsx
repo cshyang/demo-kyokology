@@ -9,6 +9,7 @@ import {
   campaignFunnel, checkpoints, dimMeans, movers, segmentTally, waffleCells, wafflePath,
 } from '@/lib/data/derive.ts'
 import { postFunnel, qualityRollup } from '@/lib/data/layers.ts'
+import { tint, token } from '@/lib/color'
 
 const ACTIVITY = [
   { when: '28 OCT 2026', lead: '96 invites unanswered after 5 days', rest: ' · reminder rule fired · Oct 2026 mid-flight', href: '/campaigns/C' },
@@ -65,7 +66,7 @@ export default function OverviewPage() {
       const d = latestM[i] - w1M[i]
       return {
         label: data.SHORT[i], v: val, pct: val, w1pct: Math.round(w1M[i]),
-        dtxt: (d >= 0 ? '+' : '') + d.toFixed(1), dc: d >= 0 ? '#5E8F80' : '#A6503F',
+        dtxt: (d >= 0 ? '+' : '') + d.toFixed(1), dc: d >= 0 ? token('sage') : token('rust'),
       }
     })
 
@@ -82,7 +83,7 @@ export default function OverviewPage() {
       .sort((a, b) => b.n - a.n)
     const wCats = [
       ...flaggedSegs,
-      { id: 'steady' as const, name: 'Steady Core', color: '#5E8F80', n: tally.steady },
+      { id: 'steady' as const, name: 'Steady Core', color: token('sage'), n: tally.steady },
       { id: 'unflagged' as const, name: 'Unflagged', color: '#C4C2BB', n: tally.unflagged },
       { id: null, name: 'Not yet assessed', color: '#EBE9E2', n: onRecord - assessed },
     ]
@@ -117,17 +118,17 @@ export default function OverviewPage() {
    * beside the funnel instead, which is also where it belongs conceptually.
    */
   const postStages = [
-    { label: 'COMPLETED', n: v.post.completed, tone: '#14283C' },
-    { label: 'REPORT OPENED', n: v.post.reportOpened, tone: '#2F4A63' },
-    { label: 'REFLECTION STARTED', n: v.post.depthStarted, tone: '#1E6F63' },
-    { label: 'PLAN STARTED', n: v.post.planStarted, tone: '#5E8F80' },
-    { label: 'EVIDENCE LOGGED', n: v.post.evidenced, tone: '#B98B3C' },
+    { label: 'COMPLETED', n: v.post.completed, tone: token('ink') },
+    { label: 'REPORT OPENED', n: v.post.reportOpened, tone: token('slate') },
+    { label: 'REFLECTION STARTED', n: v.post.depthStarted, tone: token('teal') },
+    { label: 'PLAN STARTED', n: v.post.planStarted, tone: token('sage') },
+    { label: 'EVIDENCE LOGGED', n: v.post.evidenced, tone: token('gold') },
   ]
 
   const kpis = [
-    { label: 'ON RECORD', v: v.onRecord, sub: '4 faculties · 3 intakes', href: '/people', top: 'rgba(20,40,60,.10)', color: '#14283C' },
-    { label: 'ASSESSED', v: v.assessed, sub: `${Math.round((v.assessed / v.onRecord) * 100)}% of the directory`, href: '/people', top: 'rgba(20,40,60,.10)', color: '#14283C' },
-    { label: 'NEED ACTION', v: v.flagged, sub: 'across 5 flagged patterns', href: '/segments', top: '#A6503F', color: '#A6503F' },
+    { label: 'ON RECORD', v: v.onRecord, sub: '4 faculties · 3 intakes', href: '/people', top: tint('ink', 10), color: token('ink') },
+    { label: 'ASSESSED', v: v.assessed, sub: `${Math.round((v.assessed / v.onRecord) * 100)}% of the directory`, href: '/people', top: tint('ink', 10), color: token('ink') },
+    { label: 'NEED ACTION', v: v.flagged, sub: 'across 5 flagged patterns', href: '/segments', top: token('rust'), color: token('rust') },
   ]
 
   return (
@@ -168,9 +169,9 @@ export default function OverviewPage() {
               </div>
               <div className="mt-3.5 grid grid-cols-5 gap-3">
                 {v.hist.map((h) => (
-                  <div key={h.yr} className="min-w-0 pt-2.5" style={{ borderTop: `3px solid ${h.current ? '#C9A24B' : 'rgba(20,40,60,.08)'}` }}>
+                  <div key={h.yr} className="min-w-0 pt-2.5" style={{ borderTop: `3px solid ${h.current ? token('brass') : tint('ink', 8)}` }}>
                     <div className="eyebrow text-[9px] tracking-[.12em] text-ink/45">{h.yr}</div>
-                    <div className="mt-2 text-[22px] leading-none font-black tabular-nums" style={{ color: h.current ? '#14283C' : 'rgba(20,40,60,.55)' }}>
+                    <div className="mt-2 text-[22px] leading-none font-black tabular-nums" style={{ color: h.current ? token('ink') : tint('ink', 55) }}>
                       {h.assessed}
                     </div>
                     <div className="mt-[5px] text-[10.5px] leading-[1.5] text-ink/50">of {h.invited} invited</div>
@@ -184,9 +185,9 @@ export default function OverviewPage() {
             <div className="flex w-[190px] flex-none flex-col justify-center">
               <div className="eyebrow text-[9px] tracking-[.14em] text-ink/45">SECURITY MEAN</div>
               <svg viewBox="0 0 190 44" className="mt-3 h-11 w-full overflow-visible">
-                <polyline className="chart-line" pathLength={1} points={v.spark} fill="none" stroke="#2F4A63" strokeWidth={2} />
+                <polyline className="chart-line" pathLength={1} points={v.spark} fill="none" style={{ stroke: token('slate') }} strokeWidth={2} />
                 {/* Matches chart-line's duration: the head lands as the line reaches it. */}
-                <circle className="chart-pop" style={{ animationDelay: '400ms' }} cx={v.spx(4)} cy={v.spy(v.ses[4])} r={3.2} fill="#A6503F" />
+                <circle className="chart-pop" style={{ animationDelay: '400ms', fill: token('rust') }} cx={v.spx(4)} cy={v.spy(v.ses[4])} r={3.2} />
               </svg>
               <p className="mt-2.5 text-[11px] leading-[1.5] text-ink/55">
                 {v.ses[0].toFixed(1)} in 2022 → {v.ses[4].toFixed(1)} now — drifting down as intakes broaden.

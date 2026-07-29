@@ -5,6 +5,7 @@ import {
   type Engagement, type Facet, type ResponseQuality, type TraitView,
 } from '@/lib/data/layers.ts'
 import type { Dim } from '@/lib/data/generator.ts'
+import { tint, token } from '@/lib/color'
 
 /**
  * A section heading, in the serif at 17px over a hairline rule.
@@ -40,8 +41,8 @@ export function TraitCard({ t, selected, onPick }: { t: TraitView; selected: boo
       style={{
         background: selected ? '#fff' : '#FAFAF7',
         boxShadow: selected
-          ? 'inset 0 0 0 1.5px rgba(20,40,60,.30), 0 2px 6px rgba(20,40,60,.06)'
-          : 'inset 0 0 0 1px rgba(20,40,60,.06)',
+          ? `inset 0 0 0 1.5px ${tint('ink', 30)}, 0 2px 6px ${tint('ink', 6)}`
+          : `inset 0 0 0 1px ${tint('ink', 6)}`,
       }}
     >
       <div className="flex items-baseline gap-2">
@@ -190,8 +191,8 @@ function Dot({ done }: { done: boolean }) {
     <span
       className="size-[9px] flex-none rounded-full"
       style={{
-        background: done ? '#5E8F80' : 'transparent',
-        boxShadow: done ? 'none' : 'inset 0 0 0 1.5px rgba(20,40,60,.20)',
+        background: done ? token('sage') : 'transparent',
+        boxShadow: done ? 'none' : `inset 0 0 0 1.5px ${tint('ink', 20)}`,
       }}
     />
   )
@@ -293,7 +294,7 @@ export function QualityPanel({ q }: { q: ResponseQuality }) {
         </span>
         <span
           className="ml-auto rounded-[3px] px-[5px] py-[3px] font-mono text-[8px] leading-none font-bold tracking-[.1em] text-white"
-          style={{ background: bad ? '#A6503F' : '#5E8F80' }}
+          style={{ background: bad ? token('rust') : token('sage') }}
         >
           {q.verdict}
         </span>

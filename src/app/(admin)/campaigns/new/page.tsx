@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Header } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { useDemoState, type TemplateKind } from '@/lib/demo-state'
+import { tint, token } from '@/lib/color'
 
 const STEPS = ['Test', 'Audience', 'Emails', 'Review'] as const
 
@@ -81,13 +82,13 @@ export default function NewCampaignPage() {
               >
                 <div
                   className="h-[3px] rounded-[2px]"
-                  style={{ background: i <= step ? '#14283C' : 'rgba(20,40,60,.12)' }}
+                  style={{ background: i <= step ? token('ink') : tint('ink', 12) }}
                 />
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="eyebrow text-[9px] tracking-[.12em]" style={{ color: i <= step ? '#14283C' : 'rgba(20,40,60,.4)' }}>
+                  <span className="eyebrow text-[9px] tracking-[.12em]" style={{ color: i <= step ? token('ink') : tint('ink', 40) }}>
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <span className="text-[12.5px] font-bold" style={{ color: i <= step ? '#14283C' : 'rgba(20,40,60,.4)' }}>
+                  <span className="text-[12.5px] font-bold" style={{ color: i <= step ? token('ink') : tint('ink', 40) }}>
                     {s}
                   </span>
                 </div>
@@ -104,7 +105,7 @@ export default function NewCampaignPage() {
                   key={t.id}
                   onClick={() => setTest(t.id)}
                   className="cursor-pointer rounded-[9px] p-[16px_18px] text-left"
-                  style={{ boxShadow: test === t.id ? 'inset 0 0 0 2px #14283C' : 'inset 0 0 0 1px rgba(20,40,60,.14)' }}
+                  style={{ boxShadow: test === t.id ? `inset 0 0 0 2px ${token('ink')}` : `inset 0 0 0 1px ${tint('ink', 14)}` }}
                 >
                   <div className="text-[13.5px] leading-none font-bold text-ink">{t.name}</div>
                   <div className="eyebrow mt-2 text-[9px] tracking-[.12em] text-ink/45">
