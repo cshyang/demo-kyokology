@@ -32,7 +32,14 @@ export default function FingerprintPage() {
     const coh = meanOf(data, recs)
     const uni = meanOf(data, refRecs)
     const isAll = filter.fac === 'All'
-    const facMeans = data.FACULTIES.map((f) => meanOf(data, recs.filter((r) => r.st.faculty === f.name)))
+    // Faculty separation compares all four faculties, so it ignores the faculty
+    // filter and honours only intake + wave. Deriving it from `recs` would blank
+    // three rows the moment someone picks a faculty — emptying the one panel
+    // whose entire job is the comparison.
+    const acrossFaculties = selectRecords(data, { ...filter, fac: 'All' })
+    const facMeans = data.FACULTIES.map((f) =>
+      meanOf(data, acrossFaculties.filter((r) => r.st.faculty === f.name)),
+    )
     const refShort = filter.wave === 'latest' ? 'uni' : `uni Oct ${filter.wave === 'w1' ? '25' : '26'}`
 
     const axes = data.SHORT.map((label, i) => {
@@ -104,6 +111,29 @@ export default function FingerprintPage() {
             </div>
             <p className="flex-none pt-2 text-[11.5px] leading-[1.4] text-ink/50">{v.caption}</p>
 
+            {v.recs.length === 0 ? (
+              /*
+               * Reachable and not an error: the 2026 intake has only ever been
+               * assessed in the current wave, so asking for their Oct 2025
+               * scores is a question with no answer. Rendering the radar anyway
+               * collapses it to a dot with six zeroed axes, which reads as a
+               * bug rather than an empty set.
+               */
+              <div className="flex flex-none flex-col items-center justify-center px-6 py-[72px] text-center">
+                <div className="eyebrow text-[9px] tracking-[.16em] text-ink/40">NO DATA FOR THIS COMBINATION</div>
+                <p className="mt-3.5 max-w-[46ch] text-[13px] leading-[1.7] text-ink/60">
+                  {filter.yr === '2026' && filter.wave !== 'latest'
+                    ? 'The 2026 intake has only been assessed once, in the current wave. There is no earlier assessment to show them in.'
+                    : 'No student matches this faculty, intake and wave together.'}
+                </p>
+                <button
+                  onClick={() => setFilter({ fac: 'All', yr: 'All', wave: 'latest' })}
+                  className="mt-5 cursor-pointer rounded-md border border-ink/18 px-[15px] py-[10px] text-[11.5px] leading-none font-bold text-ink hover:bg-parchment"
+                >
+                  Reset filters
+                </button>
+              </div>
+            ) : (
             <div className="flex flex-none items-center justify-center px-2 pt-[34px] pb-[18px]">
               <div className="relative w-full max-w-[640px]" style={{ aspectRatio: `${VB_W}/${VB_H}` }}>
                 <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="block h-full w-full overflow-visible">
@@ -144,6 +174,7 @@ export default function FingerprintPage() {
                 ))}
               </div>
             </div>
+            )}
 
             <div className="mt-1.5 flex flex-none flex-wrap gap-[18px] border-t border-ink/8 pt-4">
               <span className="flex items-center gap-2 text-[11.5px] leading-[1.4] text-ink/55">

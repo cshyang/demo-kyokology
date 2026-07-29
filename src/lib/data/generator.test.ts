@@ -41,6 +41,28 @@ test('archetype churn between waves stays under 8%', () => {
   assert.ok(buildData().churnPct < 8, `churn was ${buildData().churnPct}%`)
 })
 
+test('every independent tally of the segments agrees', async () => {
+  // Three places count segments: segmentCounts() here, segmentTally() in
+  // derive.ts, and the useMemo in segments/page.tsx (which calls the same
+  // helpers). If someone "simplifies" one, the hero screen and the Overview
+  // KPI diverge silently. This pins them together.
+  const { segmentTally } = await import('./derive.ts')
+  const d = buildData()
+  assert.deepEqual(segmentTally(d), EXPECTED)
+  assert.deepEqual(segmentCounts(d), segmentTally(d))
+})
+
+test('funnel numbers are the measured literals, not a recomputation', async () => {
+  // Hardcoded so a wrong cascade fails, not merely an inconsistent one:
+  // asserting the implementation against itself proves nothing.
+  const { campaignFunnel } = await import('./derive.ts')
+  const d = buildData()
+  const byId = Object.fromEntries(d.campaigns.map((c) => [c.id, campaignFunnel(c)]))
+  assert.deepEqual(byId.A, { bounced: 11, sent: 549, opened: 436, started: 341, completed: 291 })
+  assert.deepEqual(byId.B, { bounced: 11, sent: 549, opened: 436, started: 341, completed: 291 })
+  assert.deepEqual(byId.C, { bounced: 6, sent: 274, opened: 178, started: 114, completed: 78 })
+})
+
 test('funnel quotas are exact and campaigns A/B cover one population', () => {
   const d = buildData()
   const AB = d.students.filter((s) => s.intakeYear !== 2026)
