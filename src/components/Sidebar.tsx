@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const ANALYSE = [
   { href: '/overview', label: 'Overview' },
+  { href: '/fingerprint', label: 'Fingerprint' },
   { href: '/segments', label: 'Segments' },
   { href: '/longitudinal', label: 'Longitudinal' },
   { href: '/people', label: 'Students' },

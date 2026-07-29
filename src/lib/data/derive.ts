@@ -32,6 +32,36 @@ export function latest(data: DemoData, id: string) {
   return data.w2[id] ?? data.w3[id] ?? null
 }
 
+export type Wave = 'latest' | 'w1' | 'w2'
+export interface CohortFilter {
+  fac: string
+  yr: string
+  wave: Wave
+}
+
+export function recordFor(data: DemoData, id: string, wave: Wave) {
+  return wave === 'w1' ? data.w1[id] : wave === 'w2' ? data.w2[id] : latest(data, id)
+}
+
+/** Students matching the cohort filter who have a record for the selected wave. */
+export function selectRecords(data: DemoData, f: CohortFilter) {
+  const out: { st: Student; sc: Record<Dim, number>; arch: string; seg: SegmentId; at: string }[] = []
+  for (const st of data.students) {
+    if (f.fac !== 'All' && st.faculty !== f.fac) continue
+    if (f.yr !== 'All' && String(st.intakeYear) !== f.yr) continue
+    const r = recordFor(data, st.id, f.wave)
+    if (!r) continue
+    out.push({ st, ...r })
+  }
+  return out
+}
+
+export function meanOf(data: DemoData, recs: { sc: Record<Dim, number> }[]) {
+  return data.T.map((t) =>
+    recs.length ? Math.round(recs.reduce((s, r) => s + r.sc[t], 0) / recs.length) : 0,
+  )
+}
+
 export function segmentTally(data: DemoData): Record<SegmentId, number> {
   const n = {} as Record<SegmentId, number>
   for (const s of data.SEGS) n[s.id] = 0
