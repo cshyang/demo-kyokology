@@ -10,9 +10,9 @@ import { useDemoState, type TemplateKind } from '@/lib/demo-state'
 const STEPS = ['Test', 'Audience', 'Emails', 'Review'] as const
 
 const TESTS = [
-  { id: '6d', name: '6D Profile', dims: 6, q: 36, note: 'The full instrument. Six dimensions, archetype label, segment rules.' },
-  { id: 'entry', name: '6D Entry Check', dims: 6, q: 18, note: 'Shorter form for orientation week. Same dimensions, wider error bars.' },
-  { id: 'team', name: 'Team Readiness', dims: 3, q: 14, note: 'Collaboration-focused subset for project cohorts.' },
+  { id: '6d', name: '6D Profile', dims: 6, q: 100, note: 'The full Campus instrument. 100 questions across six dimensions, archetype label, segment rules.' },
+  { id: 'entry', name: '6D Entry Check', dims: 6, q: 18, note: 'Short onboarding form — three items per dimension. Not the full Campus report.' },
+  { id: 'team', name: 'Team Readiness', dims: 3, q: 14, note: 'Collaboration subset for project cohorts — three dimensions only. Not a standalone report.' },
 ]
 
 export default function NewCampaignPage() {

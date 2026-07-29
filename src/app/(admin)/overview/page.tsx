@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Header, HeaderButton } from '@/components/Header'
@@ -36,6 +36,8 @@ function MoreLink({ href, children }: { href: string; children: React.ReactNode 
 export default function OverviewPage() {
   const data = useDemoData()
   const router = useRouter()
+  /** Which waffle category the pointer is over, so the rest can fall back. */
+  const [hoverCat, setHoverCat] = useState<number | null>(null)
 
   const v = useMemo(() => {
     const tally = segmentTally(data)
@@ -182,8 +184,9 @@ export default function OverviewPage() {
             <div className="flex w-[190px] flex-none flex-col justify-center">
               <div className="eyebrow text-[9px] tracking-[.14em] text-ink/45">SECURITY MEAN</div>
               <svg viewBox="0 0 190 44" className="mt-3 h-11 w-full overflow-visible">
-                <polyline points={v.spark} fill="none" stroke="#2F4A63" strokeWidth={2} />
-                <circle cx={v.spx(4)} cy={v.spy(v.ses[4])} r={3.2} fill="#A6503F" />
+                <polyline className="chart-line" pathLength={1} points={v.spark} fill="none" stroke="#2F4A63" strokeWidth={2} />
+                {/* Matches chart-line's duration: the head lands as the line reaches it. */}
+                <circle className="chart-pop" style={{ animationDelay: '400ms' }} cx={v.spx(4)} cy={v.spy(v.ses[4])} r={3.2} fill="#A6503F" />
               </svg>
               <p className="mt-2.5 text-[11px] leading-[1.5] text-ink/55">
                 {v.ses[0].toFixed(1)} in 2022 → {v.ses[4].toFixed(1)} now — drifting down as intakes broaden.
@@ -271,12 +274,19 @@ export default function OverviewPage() {
                 Mean of all assessed students · gold tick marks each dimension at first assessment
               </p>
               <div className="mt-4 flex flex-col gap-3">
-                {v.dims.map((d) => (
-                  <div key={d.label} className="flex items-center gap-2.5">
-                    <div className="eyebrow w-[74px] flex-none truncate text-[9px] tracking-[.1em] text-ink/55">{d.label}</div>
+                {v.dims.map((d, i) => (
+                  <div key={d.label} className="group flex items-center gap-2.5">
+                    <div className="eyebrow w-[74px] flex-none truncate text-[9px] tracking-[.1em] text-ink/55 transition-colors group-hover:text-ink">{d.label}</div>
                     <div className="relative h-2 min-w-[120px] flex-1 rounded-[4px] bg-parchment">
-                      <div className="absolute inset-y-0 left-0 rounded-[4px] bg-slate" style={{ width: `${d.pct}%` }} />
-                      <div className="absolute -top-0.5 -bottom-0.5 w-0.5 bg-brass" style={{ left: `${d.w1pct}%` }} />
+                      {/* Staggered so the six read as a cascade rather than one block.
+                          Six at 50ms is 250ms of stagger — the whole group is settled
+                          inside the time a single bar takes to travel. */}
+                      <div
+                        className="chart-bar absolute inset-y-0 left-0 rounded-[4px] bg-slate group-hover:bg-ink"
+                        style={{ width: `${d.pct}%`, animationDelay: `${i * 50}ms` }}
+                      />
+                      {/* Keyed off --dur-move: each tick lands as its own bar arrives. */}
+                      <div className="chart-pop absolute -top-0.5 -bottom-0.5 w-0.5 bg-brass" style={{ left: `${d.w1pct}%`, animationDelay: `${320 + i * 50}ms` }} />
                     </div>
                     <div className="w-6 flex-none text-right font-mono text-[11px] leading-none font-bold text-ink">{d.v}</div>
                     <div className="w-9 flex-none text-right font-mono text-[10px] leading-none font-semibold" style={{ color: d.dc }}>
@@ -328,12 +338,29 @@ export default function OverviewPage() {
                 </p>
                 <svg viewBox={`0 0 147 ${v.waffleH}`} className="mt-3.5 block h-auto w-full max-w-[230px]">
                   {v.paths.map((p, i) => (
-                    <path key={i} d={p.d} fill={p.color} />
+                    /*
+                     * The entrance lives on the wrapper and the hover dim on the
+                     * path. Both on one element and the animation wins: fill-mode
+                     * `both` pins opacity at 1 for good, and hovering does nothing.
+                     */
+                    <g key={i} className="chart-pop" style={{ animationDelay: `${i * 55}ms` }}>
+                      <path
+                        className="chart-fade"
+                        d={p.d}
+                        fill={p.color}
+                        opacity={hoverCat === null || hoverCat === i ? 1 : 0.18}
+                      />
+                    </g>
                   ))}
                 </svg>
                 <div className="mt-3.5 flex flex-col gap-2">
                   {v.wCats.map((g, i) => (
-                    <div key={g.name} className="flex items-center gap-2.5 rounded-[5px] px-1 py-0.5">
+                    <div
+                      key={g.name}
+                      onMouseEnter={() => setHoverCat(i)}
+                      onMouseLeave={() => setHoverCat(null)}
+                      className={`flex cursor-default items-center gap-2.5 rounded-[5px] px-1 py-0.5 transition-colors ${hoverCat === i ? 'bg-parchment' : ''}`}
+                    >
                       <span className="size-[9px] flex-none rounded-[2px]" style={{ background: g.color }} />
                       <span className={`flex-1 text-[12px] leading-[1.3] ${i < 5 ? 'text-ink' : 'text-ink/55'}`}>{g.name}</span>
                       <span className={`font-mono text-[11.5px] leading-none font-bold ${i < 5 ? 'text-ink' : 'text-ink/55'}`}>

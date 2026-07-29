@@ -138,8 +138,9 @@ function Assessment() {
           Your 6D Profile
         </h1>
         <p className="mt-4 text-[14px] leading-[1.75] text-ink/70">
-          Hi {student.name} — this takes about 15 minutes. There are 36
-          statements and no right answers.
+          Hi {student.name} — a short sample of the 6D Profile, six statements
+          per dimension. The full assessment is 100 questions and takes about
+          35–45 minutes. There are no right answers.
         </p>
 
         <div className="mt-7 rounded-[12px] bg-cream p-[18px_20px]">
@@ -334,7 +335,7 @@ function StudentLink() {
               they are not chased.
             </p>
             <div className="mt-[15px] font-mono text-[11px] leading-[1.6] text-ink/45">
-              36 STATEMENTS · PAGES OF THREE · NO RIGHT ANSWERS
+              36-STATEMENT SAMPLE · PAGES OF THREE · NO RIGHT ANSWERS
             </div>
           </div>
         </div>

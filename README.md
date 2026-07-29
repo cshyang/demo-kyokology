@@ -4,6 +4,8 @@ A clickable, fully explorable sales-pitch artifact for KYKOLOGY's 6D Profile, ai
 university administrators. Every number on screen is generated from a fixed seed. Nothing is
 sent, stored, or persisted.
 
+**Live: <https://kykology-admin-demo.cshyang-chng.workers.dev>**
+
 ![Segments](docs/screens/segments.png)
 
 ## Run it
@@ -94,6 +96,11 @@ npx wrangler deploy
 Static export to Cloudflare Workers static assets — free plan, no adapter. See the comment
 in `next.config.ts` for the constraint this imposes and the one-line change that lifts it
 when the demo graduates to a pilot.
+
+**Give it a minute before demoing.** For roughly a minute after `wrangler deploy`, routes
+flap between 200 and 404 as assets propagate — `/overview` 404s while `/segments` works,
+then they swap. It settles on its own. Don't go chasing a build problem that isn't there,
+and don't deploy five minutes before a meeting.
 
 ## What this is not
 

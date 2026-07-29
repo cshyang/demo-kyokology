@@ -182,7 +182,12 @@ export default function SegmentsPage() {
             <div>CONSENT</div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-auto">
+          {/*
+            Keyed on the selection so the roster crossfades when the pattern
+            changes. Without it the list swaps under a stationary header and the
+            only clue that anything happened is the row count.
+          */}
+          <div key={selected} className="chart-appear min-h-0 flex-1 overflow-auto">
             {rows.map(({ st, sc, arch, at }) => (
               <div
                 key={st.id}

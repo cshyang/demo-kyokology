@@ -5,5 +5,13 @@ next-env.d.ts
 *.tsbuildinfo
 out/
 
+# Secrets — never commit. .env.local holds the Cloudflare API token locally;
+# a stray `git add .` here would leak it to a PUBLIC repo.
+.env*
+
 # Visual-diff captures live in the session scratchpad, not the repo.
 .playwright-mcp/
+
+# Claude Code session state: worktrees, scratchpads. A `git add -A` would
+# otherwise sweep in the nested worktree git repo as an embedded submodule.
+.claude/

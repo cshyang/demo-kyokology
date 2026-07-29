@@ -166,6 +166,7 @@ export function StudentProfile({ id }: { id: string }) {
               {v.cloud.map((p) => (
                 <circle
                   key={p.id}
+                  className="chart-point"
                   cx={p.x}
                   cy={100 - p.y}
                   r={p.me ? 2.6 : 1.1}
