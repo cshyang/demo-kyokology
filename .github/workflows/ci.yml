@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# One live URL. Two deploys racing for it is worse than the second one waiting,
+# and a superseded run has nothing useful to say.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # >=22.18 strips TypeScript types natively, which is how the test
+          # suite runs .ts files with no build step and no test framework.
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run typecheck
+
+      # The real gate. Every published figure in this demo — the seven segment
+      # counts, the archetype churn, the funnel quotas — is a function of the
+      # mulberry32 stream and the exact order rnd() is called in. A refactor
+      # that looks harmless can move all of them while the code still compiles.
+      - run: npm test
+
+      - run: npm run build
+
+      - name: Deploy to Cloudflare Workers
+        id: deploy
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      # A green deploy step only means the upload succeeded. It does not mean
+      # anyone can open the demo — so check that they can, before calling it done.
+      - name: Smoke-test the deployment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          BASE: ${{ steps.deploy.outputs.deployment-url || 'https://kykology-admin-demo.cshyang-chng.workers.dev' }}
+        run: |
+          set -u
+          ROUTES="/ /overview /segments /fingerprint /longitudinal /people /templates
+                  /campaigns /campaigns/A /campaigns/B /campaigns/C /campaigns/new
+                  /students/profile /t /kykology-wordmark.png"
+
+          probe() { curl -s -o /dev/null -w '%{http_code}' --max-time 20 "$1" || echo 000; }
+
+          # Assets propagate for roughly a minute after upload, and routes flap
+          # between 200 and 404 while they do. Any single probe is meaningless;
+          # only a pass where every route is 200 at once counts.
+          for attempt in $(seq 1 20); do
+            bad=""
+            for r in $ROUTES; do
+              code=$(probe "$BASE$r")
+              [ "$code" = "200" ] || bad="$bad $r($code)"
+            done
+
+            if [ -z "$bad" ]; then
+              # A missing page must 404. If not_found_handling regressed to
+              # single-page-application, every unknown path would return
+              # index.html with a 200 — and the loop above would pass whether
+              # or not a single real route survived the build.
+              missing=$(probe "$BASE/this-page-does-not-exist")
+              if [ "$missing" != "404" ]; then
+                echo "::error::Unknown paths return $missing, not 404. Check assets.not_found_handling in wrangler.jsonc — the route check above proves nothing while a catch-all is serving index.html."
+                exit 1
+              fi
+              echo "All routes 200 and unknown paths 404, on attempt $attempt."
+              exit 0
+            fi
+
+            echo "attempt $attempt — still settling:$bad"
+            sleep 15
+          done
+
+          echo "::error::Still failing after ~5 minutes:$bad"
+          exit 1
