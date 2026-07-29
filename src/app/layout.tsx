@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Lora, Lato, IBM_Plex_Mono } from 'next/font/google'
-import { Sidebar } from '@/components/Sidebar'
 import { DemoStateProvider } from '@/lib/demo-state'
 import './globals.css'
 
@@ -17,13 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${lora.variable} ${lato.variable} ${mono.variable}`}>
       <body>
-        <DemoStateProvider>
-          <div className="flex h-screen overflow-hidden">
-          <Sidebar />
-          {/* Each screen renders its own <Header>, then a scrolling body. */}
-          <main className="flex min-w-0 flex-1 flex-col bg-white">{children}</main>
-          </div>
-        </DemoStateProvider>
+        <DemoStateProvider>{children}</DemoStateProvider>
       </body>
     </html>
   )
