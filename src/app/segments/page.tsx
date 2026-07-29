@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Header } from '@/components/Header'
 import { useDemoData, SEGMENT_META, latestResult, assessedStudents, toCsv } from '@/lib/data/demo.ts'
 import type { SegmentId } from '@/lib/data/generator.ts'
 
@@ -47,7 +48,9 @@ export default function SegmentsPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-col gap-3.5 px-[26px] py-[22px]">
+    <>
+      <Header title="Segments" sub={`${assessed} assessed students · seven mutually exclusive buckets`} />
+      <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-auto bg-[#FCFCFA] px-[26px] py-[22px]">
       <p className="max-w-[86ch] px-0.5 pt-0.5 text-[13.5px] leading-[1.7] text-pretty text-ink/72">{LEAD}</p>
 
       <section className="flex-none rounded-[10px] border border-ink/10 bg-white p-[18px_20px]">
@@ -144,6 +147,7 @@ export default function SegmentsPage() {
           ))}
         </div>
       </section>
-    </div>
+      </div>
+    </>
   )
 }

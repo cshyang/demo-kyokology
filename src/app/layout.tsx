@@ -18,7 +18,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <div className="flex h-screen overflow-hidden">
           <Sidebar />
-          <main className="min-w-0 flex-1 overflow-auto bg-cream">{children}</main>
+          {/* Each screen renders its own <Header>, then a scrolling body. */}
+          <main className="flex min-w-0 flex-1 flex-col bg-white">{children}</main>
         </div>
       </body>
     </html>
