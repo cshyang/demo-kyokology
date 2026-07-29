@@ -132,7 +132,7 @@ export default function CampaignsPage() {
             >
               <div>
                 <div className="text-[12.5px] leading-[1.3] font-bold text-ink">{c.name}</div>
-                <div className="eyebrow mt-1 text-[10px] tracking-normal text-ink/45">6D PROFILE · 36 QUESTIONS</div>
+                <div className="eyebrow mt-1 text-[10px] tracking-normal text-ink/45">6D PROFILE · 100 QUESTIONS</div>
               </div>
               <div className="text-[12px] leading-[1.3] text-ink/65">{c.audience}</div>
               <div className="font-mono text-[11px] leading-none text-ink/60">{c.sentLabel.toUpperCase()}</div>

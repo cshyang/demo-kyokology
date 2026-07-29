@@ -43,10 +43,10 @@ export type TemplateKind = 'invite' | 'reminder' | 'thanks'
  */
 const DEFAULT_TEMPLATES: Record<TemplateKind, Template> = {
   invite: {
-    subject: 'Your KYKOLOGY 6D Profile — 15 minutes, {{student_name}}',
+    subject: 'Your KYKOLOGY 6D Profile — about 40 minutes, {{student_name}}',
     body: `Hi {{student_name}},
 
-Your faculty is running {{test_name}} this term. It takes about 15 minutes and there are no right answers.
+Your faculty is running {{test_name}} this term. It takes about 35–45 minutes and there are no right answers.
 
 Your results are shared with your institution so we can point support and opportunities at the right people. You can see your own profile as soon as you finish.
 
@@ -58,7 +58,7 @@ Deadline: {{deadline}}
     subject: 'Still open: {{test_name}} closes {{deadline}}',
     body: `Hi {{student_name}},
 
-You haven't started {{test_name}} yet. It's 15 minutes, and it closes on {{deadline}}.
+You haven't started {{test_name}} yet. It takes about 35–45 minutes, and it closes on {{deadline}}.
 
 If you started and got interrupted, the link picks up where you left off.
 

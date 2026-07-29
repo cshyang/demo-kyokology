@@ -11,3 +11,7 @@ out/
 
 # Visual-diff captures live in the session scratchpad, not the repo.
 .playwright-mcp/
+
+# Claude Code session state: worktrees, scratchpads. A `git add -A` would
+# otherwise sweep in the nested worktree git repo as an embedded submodule.
+.claude/

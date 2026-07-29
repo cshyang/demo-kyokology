@@ -182,7 +182,7 @@ export function Sidebar() {
 
       {collapsed ? null : (
         <div className="mt-auto flex flex-col gap-[5px] border-t border-white/10 px-5 pt-4">
-          <div className="seed-line text-white/34">6D PROFILE · 36 QUESTIONS</div>
+          <div className="seed-line text-white/34">6D PROFILE · 100 QUESTIONS</div>
           <div className="seed-line text-white/34">840 STUDENTS · SEED 4B59A71D</div>
         </div>
       )}
