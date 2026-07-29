@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Header, HeaderButton } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
 import { campaignFunnel } from '@/lib/data/derive.ts'
+import { useDemoState } from '@/lib/demo-state'
 import type { SendStatus } from '@/lib/data/generator.ts'
 
 const STATUS_COLOR: Record<SendStatus, { color: string; tint: string }> = {
@@ -19,6 +21,8 @@ type Filter = 'all' | 'noprogress' | SendStatus
 
 export function CampaignDetail({ id }: { id: string }) {
   const data = useDemoData()
+  const router = useRouter()
+  const { templates } = useDemoState()
 
   const [filter, setFilter] = useState<Filter>('all')
   const [nudgeOpen, setNudgeOpen] = useState(false)
@@ -72,6 +76,7 @@ export function CampaignDetail({ id }: { id: string }) {
   ]
 
   const GRID = '[grid-template-columns:120px_150px_70px_1fr_120px]'
+  const reminder = templates.reminder
 
   return (
     <>
@@ -134,12 +139,10 @@ export function CampaignDetail({ id }: { id: string }) {
             </div>
             <div className="bg-white p-[16px_18px]">
               <div className="eyebrow text-[9px] tracking-[.14em] text-ink/45">SUBJECT</div>
-              <p className="mt-1.5 text-[12.5px] leading-[1.5] font-bold text-ink">
-                Still open: 6D Profile closes 14 Nov 2026
-              </p>
+              <p className="mt-1.5 text-[12.5px] leading-[1.5] font-bold text-ink">{reminder.subject}</p>
               <div className="eyebrow mt-3.5 text-[9px] tracking-[.14em] text-ink/45">BODY</div>
               <p className="mt-1.5 max-w-[70ch] text-[12.5px] leading-[1.7] whitespace-pre-line text-ink/70">
-                {`Hi {{student_name}},\n\nYou haven't started the 6D Profile yet. It takes about 15 minutes and it closes on {{deadline}}.\n\nIf you started and got interrupted, your link picks up where you left off.\n\n— Student Services`}
+                {reminder.body}
               </p>
               <Link href="/templates" className="mt-3.5 inline-block text-[11.5px] leading-none font-bold text-teal hover:underline">
                 Edit this template →
@@ -176,7 +179,12 @@ export function CampaignDetail({ id }: { id: string }) {
               const pct = status === 'completed' ? 100 : status === 'started' ? 45 : status === 'opened' ? 8 : 0
               const tone = STATUS_COLOR[status]
               return (
-                <div key={st.id} className={`grid items-center gap-3 border-b border-ink/6 p-[11px_18px] hover:bg-cream ${GRID}`}>
+                <div
+                  key={st.id}
+                  onClick={() => router.push(`/t?id=${st.id}&status=${status}&from=${campaign.id}`)}
+                  title="Open this student's link"
+                  className={`grid cursor-pointer items-center gap-3 border-b border-ink/6 p-[11px_18px] hover:bg-cream ${GRID}`}
+                >
                   <div className="text-[12px] leading-[1.3] font-bold text-ink">{st.name}</div>
                   <div className="text-[12px] leading-[1.3] text-ink/70">{st.faculty}</div>
                   <div className="font-mono text-[11px] leading-none text-ink/70">{st.intakeYear}</div>

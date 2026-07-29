@@ -1,29 +1,43 @@
 'use client'
 
 import { Suspense, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Header, HeaderButton } from '@/components/Header'
 import { useDemoData } from '@/lib/data/demo.ts'
+import { useDemoState } from '@/lib/demo-state'
 import { PER_PAGE, QUESTIONS, SCALE } from '@/lib/data/questions.ts'
 import type { Dim } from '@/lib/data/generator.ts'
 
 /**
- * Student-facing assessment. Deliberately outside the admin layout — this is
- * what lands in a student's inbox, and the first thing a prospect asks to see.
+ * "Student link" — the admin looking at one person's link, with what that person
+ * actually sees rendered beside it.
  *
- * Wrapped in a phone bezel rather than the prototype's full iOS chrome: the
- * point is "this is a phone", not a faithful reproduction of iOS.
+ * It sits inside the admin chrome on purpose. The pitch is not "here is a nice
+ * mobile form"; it is "here is the exact state this row is in, and here is what
+ * they are looking at right now" — which only lands if both are on screen at once.
  */
+const STATE_NOTE: Record<string, string> = {
+  sent: 'The invite is out and this link has never been opened. It looks exactly like this when they finally tap it.',
+  opened: 'They opened the email and landed here, then left before consenting. Nothing is recorded until they agree.',
+  started:
+    'They got part way and stopped. There is no resume by design — the link reopens at the same question every time, so a reload never costs them their place.',
+  completed:
+    'Finished. This is the profile they saw, built from their own answers — the same numbers your Fingerprint screen aggregates.',
+  bounced:
+    'This invite never arrived, so the link was never live. Failed sends stay visible rather than being quietly dropped.',
+}
+
 function PhoneFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ink p-6">
-      <div className="w-full max-w-[392px]">
+    <div className="flex min-h-0 flex-col justify-center rounded-[10px] bg-ink p-5">
+      <div className="mx-auto w-full max-w-[392px]">
         <div className="relative overflow-hidden rounded-[42px] bg-black p-[10px] shadow-[0_24px_60px_rgba(0,0,0,.45)]">
-          <div className="relative flex h-[760px] flex-col overflow-hidden rounded-[33px] bg-white">
+          <div className="relative flex h-[700px] flex-col overflow-hidden rounded-[33px] bg-white">
             <div className="pointer-events-none absolute top-2 left-1/2 z-10 h-[26px] w-[104px] -translate-x-1/2 rounded-full bg-black" />
             {children}
           </div>
         </div>
-        <p className="mt-4 text-center text-[11.5px] leading-[1.6] text-white/45">
+        <p className="mt-3.5 text-center text-[11.5px] leading-[1.6] text-white/45">
           What the student receives · one link per person, mobile first
         </p>
       </div>
@@ -37,10 +51,47 @@ function Assessment() {
   const sid = params.get('id') ?? 'S0141'
   const student = data.byId[sid] ?? data.students[0]
 
-  const [stage, setStage] = useState<'welcome' | 'questions' | 'done'>('welcome')
-  const [consent, setConsent] = useState(false)
-  const [page, setPage] = useState(0)
-  const [answers, setAnswers] = useState<Record<number, number>>({})
+  /**
+   * "Opened in the state their row is in" is a claim the screen has to honour:
+   * a student the campaign lists as STARTED opens mid-questionnaire, one listed
+   * as COMPLETED opens on their result.
+   *
+   * The prefilled answers are inverted from that student's stored profile
+   * (score 0..100 -> mean 1..5), so a completed link shows the same numbers the
+   * Fingerprint screen aggregates rather than a plausible-looking invention.
+   */
+  const status = params.get('status') ?? 'sent'
+  const seeded = useMemo(() => {
+    if (status !== 'started' && status !== 'completed') return { stage: 'welcome' as const, page: 0, answers: {} }
+    const rec = data.w3[student.id] ?? data.w2[student.id] ?? data.w1[student.id]
+    if (!rec) return { stage: 'welcome' as const, page: 0, answers: {} }
+    const upTo = status === 'completed' ? QUESTIONS.length : PER_PAGE * 4
+    const answers: Record<number, number> = {}
+    // Per dimension, spread integer 1..5 answers so their mean lands back on the
+    // stored score. Rounding each item independently instead would quantise every
+    // dimension to 0/25/50/75/100 and openly contradict the stored profile.
+    //
+    // Lands within ~2 points, not exactly: six Likert items can only express
+    // multiples of 100/24, so 44 is unreachable and 46 is the nearest. That gap
+    // is the instrument's real resolution, not a rounding bug.
+    for (const dim of data.T) {
+      const idx = QUESTIONS.map((q, i) => (q.dim === dim ? i : -1)).filter((i) => i >= 0 && i < upTo)
+      if (!idx.length) continue
+      const target = (rec.sc[dim] / 100) * 4 + 1
+      const need = Math.round(target * idx.length)
+      const base = Math.floor(need / idx.length)
+      const extra = need - base * idx.length
+      idx.forEach((i, k) => {
+        answers[i] = Math.min(5, Math.max(1, base + (k < extra ? 1 : 0)))
+      })
+    }
+    return { stage: status === 'completed' ? ('done' as const) : ('questions' as const), page: status === 'completed' ? 0 : 4, answers }
+  }, [status, student.id, data])
+
+  const [stage, setStage] = useState<'welcome' | 'questions' | 'done'>(seeded.stage)
+  const [consent, setConsent] = useState(seeded.stage !== 'welcome')
+  const [page, setPage] = useState(seeded.page)
+  const [answers, setAnswers] = useState<Record<number, number>>(seeded.answers)
 
   const pages = Math.ceil(QUESTIONS.length / PER_PAGE)
   const slice = QUESTIONS.slice(page * PER_PAGE, (page + 1) * PER_PAGE)
@@ -211,12 +262,79 @@ function Assessment() {
   )
 }
 
+function StudentLink() {
+  const params = useSearchParams()
+  const router = useRouter()
+  const data = useDemoData()
+  const { newCampaigns } = useDemoState()
+
+  const sid = params.get('id') ?? 'S0141'
+  const student = data.byId[sid] ?? data.students[0]
+  const status = params.get('status') ?? 'sent'
+  const from = params.get('from') ?? 'C'
+  const campaign =
+    [...data.campaigns, ...newCampaigns].find((c) => c.id === from)?.name ?? data.campaigns[2].name
+
+  // Stable per student, and obviously not a real token — nobody should think this resolves.
+  const url = `kykology.edu/t/${student.id.slice(1)}-${((student.id.charCodeAt(3) * 7) % 9000) + 1000}`
+
+  return (
+    <>
+      <Header
+        title={`${student.name}\u2019s link`}
+        sub="What this student sees — opened in the state their row is in."
+      >
+        <HeaderButton onClick={() => router.push(`/campaigns/${from}`)}>← Back</HeaderButton>
+      </Header>
+
+      <div className="grid min-h-0 flex-1 items-stretch gap-[18px] overflow-auto bg-[#FCFCFA] px-[26px] py-[22px] [grid-template-columns:1fr_430px]">
+        <div className="flex min-h-0 flex-col gap-4 rounded-[10px] border border-ink/10 bg-white p-[22px_24px]">
+          <div className="flex flex-none items-start gap-3.5">
+            <div className="flex-1">
+              <div className="font-display text-[20px] leading-[1.3] font-semibold text-ink">{student.name}</div>
+              <div className="mt-[7px] font-mono text-[11.5px] leading-[1.4] text-ink/50">
+                {student.faculty} · {student.intakeYear} intake · {student.email}
+              </div>
+            </div>
+            <div className="eyebrow flex-none rounded-[4px] bg-parchment px-[9px] py-[7px] text-[9.5px] font-bold tracking-[.1em] text-ink">
+              {status.toUpperCase()}
+            </div>
+          </div>
+
+          <div className="flex-none">
+            <div className="eyebrow text-[9px] tracking-[.16em] text-ink/45">THEIR LINK · {campaign}</div>
+            <div className="mt-[11px] font-mono text-[14px] leading-[1.4] font-medium text-ink">{url}</div>
+          </div>
+
+          <div className="flex-none rounded-[9px] bg-cream p-[16px_18px] text-[12.5px] leading-[1.7] text-ink/70">
+            {STATE_NOTE[status] ?? STATE_NOTE.sent}
+          </div>
+
+          <div className="min-h-0 flex-1 overflow-auto rounded-[9px] bg-cream p-[18px_20px]">
+            <div className="eyebrow text-[9px] tracking-[.16em] text-ink/45">WHAT THE STUDENT AGREES TO</div>
+            <p className="mt-[13px] text-[12.5px] leading-[1.8] text-ink/70">
+              Results are shared with Kykology University so support and opportunities can be pointed at the right
+              people. The student sees their own profile the moment they finish. Declining is recorded as declined —
+              they are not chased.
+            </p>
+            <div className="mt-[15px] font-mono text-[11px] leading-[1.6] text-ink/45">
+              36 STATEMENTS · PAGES OF THREE · NO RIGHT ANSWERS
+            </div>
+          </div>
+        </div>
+
+        <PhoneFrame>
+          <Assessment />
+        </PhoneFrame>
+      </div>
+    </>
+  )
+}
+
 export default function StudentLinkPage() {
   return (
-    <PhoneFrame>
-      <Suspense fallback={<div className="p-8 text-[13px] text-ink/50">Loading…</div>}>
-        <Assessment />
-      </Suspense>
-    </PhoneFrame>
+    <Suspense fallback={<div className="p-8 text-[13px] text-ink/50">Loading…</div>}>
+      <StudentLink />
+    </Suspense>
   )
 }

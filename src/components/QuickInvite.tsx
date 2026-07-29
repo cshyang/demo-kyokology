@@ -110,7 +110,6 @@ export function QuickInvite() {
               >
                 Cancel
               </button>
-              <div className="text-[11px] leading-[1.5] text-ink/50">Files under “One-off invites · Nov 2026”</div>
               <button
                 onClick={send}
                 disabled={!valid}

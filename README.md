@@ -47,12 +47,12 @@ while the code still looks correct.
 | `/fingerprint` | Six-axis radar, faculty separation, archetype distribution |
 | `/segments` | **The hero.** Seven trait-rule buckets with attached actions, plus the roster |
 | `/longitudinal` | Dimension movement, the "22 of 55 moved out" headline, pattern migration |
-| `/students` · `/students/profile?id=` | Roster and the individual profile with calibration scatter |
+| `/students/profile?id=` | The individual profile with calibration scatter, reached from People |
 | `/campaigns` · `/campaigns/[id]` | Funnel tracking and the nudge flow |
 | `/campaigns/new` | Four-step wizard: Test → Audience → Emails → Review |
 | `/people` | Directory with CSV import and email dedupe |
 | `/templates` | The three messages, with a live preview |
-| `/t?id=` | **What the student sees.** Consent, 36 items, live scoring |
+| `/t?id=&status=&from=` | **Student link.** The row's state beside what that student sees — consent, 36 items, live scoring |
 
 ## Architecture
 
@@ -61,8 +61,7 @@ while the code still looks correct.
  src/lib/data/derive.ts      aggregates: funnels, migration, waffle, radar inputs
  src/lib/data/questions.ts   the 36-item bank, 6 per dimension
  src/lib/demo-state.tsx      React context — every mutation the demo allows
- src/app/(admin)/            admin screens, sidebar chrome
- src/app/t/                  student flow, deliberately outside that chrome
+ src/app/(admin)/            every screen, including the student link at /t
 ```
 
 **Mutations live in React context, never module scope.** Client components render on the
@@ -75,6 +74,14 @@ without anyone remembering to reset it.
 twelve colours, they are one colour at twelve opacities — so there is a single `--color-ink`
 and the alpha is expressed at the call site (`text-ink/45`, `border-ink/10`). Light mode
 only, by design.
+
+IBM Plex Mono appears at four distinct settings and they are not interchangeable — each
+marks a different rank of label. They are four utilities (`eyebrow`, `nav-group`,
+`seed-line`, `rule-mono`), not one utility plus tracking overrides at the call site.
+
+Element defaults live in `@layer base`. Unlayered CSS outranks every layered utility
+regardless of specificity, so an unlayered `a { color: teal }` silently beats
+`text-white/62` on a link.
 
 ## Deploying
 

@@ -96,10 +96,6 @@ export function StudentProfile({ id }: { id: string }) {
   return (
     <div className="min-h-0 flex-1 overflow-auto bg-[#FCFCFA]">
       <div className="mx-auto max-w-[860px] px-[26px] pt-[34px] pb-[44px]">
-        <Link href="/students" className="text-[11.5px] leading-none font-bold text-teal hover:underline">
-          ← All students
-        </Link>
-
         <div className="mt-4 flex items-baseline gap-3">
           <h1 className="font-display text-[27px] leading-[1.15] font-semibold tracking-[-.01em] text-ink">
             {v.cur.rec.arch}
