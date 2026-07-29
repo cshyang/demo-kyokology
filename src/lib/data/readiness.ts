@@ -1,6 +1,6 @@
 import { DIMS, type DemoData, type Dim } from './generator.ts'
-import { recordFor, type Wave } from './derive.ts'
-import { dynOf, extraWaves, facetsOf, waveSeries } from './layers.ts'
+import { recordFor, waffleCells, type Wave } from './derive.ts'
+import { dynOf, extraWaves, facetsOf, k7s, kband, MAG_LEGEND, waveSeries } from './layers.ts'
 
 /**
  * The educator half of "one framework, two views".
@@ -140,4 +140,97 @@ export function readinessOf(data: DemoData, wave: Wave): ReadinessRow[] {
   }
 
   return rows
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cohort tiles
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Swing magnitude bands. A ramp by size, not a verdict — the report frames
+ * dynamic range as developmental, so no band is coloured as a failure.
+ */
+export const SWING_BANDS = [
+  { name: 'STEADY', lo: 0, hi: 8, color: '#8A8F94' },
+  { name: 'SHIFTS', lo: 8, hi: 13, color: '#6E96BF' },
+  { name: 'WIDE', lo: 13, hi: 18, color: '#B98B3C' },
+  { name: 'VOLATILE', lo: 18, hi: Infinity, color: '#A6503F' },
+] as const
+
+export const NOT_MEASURABLE = 'NOT YET MEASURABLE'
+
+export interface BandShare {
+  name: string
+  color: string
+  /** Largest-remainder percentage — the shares across one tile sum to exactly 100. */
+  pct: number
+  n: number
+}
+
+export interface TileView {
+  key: string
+  name: string
+  blurb: string
+  /** The three facets this read is built from, or null for the pressure read. */
+  facetNames: string[] | null
+  /** Cohort mean on the 1–7 scale, or null for pressure and for an empty cohort. */
+  v7: string | null
+  /** Median widest swing in points. Pressure read only. */
+  median: number | null
+  bands: BandShare[]
+  headline: string
+  n: number
+}
+
+/**
+ * Five tiles from a filtered row set.
+ *
+ * The headline is a share rather than a band name for a measured reason:
+ * averaging three facets collapses variance, so a single band can hold 62% of
+ * the cohort and the five-band bar barely changes between faculties. The
+ * "DEVELOPING or below" share ranges 31–88% across filter cuts and is what
+ * actually carries the movement. See the spec's §3.1.
+ */
+export function tally(rows: ReadinessRow[]): TileView[] {
+  const n = rows.length
+
+  return READS.map((r): TileView => {
+    if (r.facets) {
+      const vals = rows.map((x) => x.scores[r.key])
+      const counts = MAG_LEGEND.map((b) => vals.filter((v) => kband(v).t === b.t).length)
+      const pct = n ? waffleCells(counts, n) : counts.map(() => 0)
+      const below = counts[0] + counts[1]
+      return {
+        key: r.key,
+        name: r.name,
+        blurb: r.blurb,
+        facetNames: r.facets.map(([, name]) => name),
+        v7: n ? k7s(vals.reduce((a, b) => a + b, 0) / n) : null,
+        median: null,
+        bands: MAG_LEGEND.map((b, i) => ({ name: b.t, color: b.c, pct: pct[i], n: counts[i] })),
+        headline: n
+          ? `DEVELOPING or below for ${Math.round((below / n) * 100)}% of ${n}`
+          : NOT_MEASURABLE,
+        n,
+      }
+    }
+
+    const sw = rows.map((x) => x.swing).sort((a, b) => a - b)
+    const counts = SWING_BANDS.map((b) => sw.filter((v) => v >= b.lo && v < b.hi).length)
+    const pct = n ? waffleCells(counts, n) : counts.map(() => 0)
+    const wide = counts[2] + counts[3]
+    return {
+      key: r.key,
+      name: r.name,
+      blurb: r.blurb,
+      facetNames: null,
+      v7: null,
+      median: n ? sw[Math.floor(n / 2)] : null,
+      bands: SWING_BANDS.map((b, i) => ({ name: b.name, color: b.color, pct: pct[i], n: counts[i] })),
+      headline: n
+        ? `Shifts widely or more for ${Math.round((wide / n) * 100)}% of ${n}`
+        : NOT_MEASURABLE,
+      n,
+    }
+  })
 }
