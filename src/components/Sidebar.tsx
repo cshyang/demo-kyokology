@@ -143,7 +143,8 @@ export function Sidebar() {
       <button
         onClick={() => setCollapsed((c) => !c)}
         aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        className="absolute top-[150px] -right-[13px] z-40 flex size-[26px] cursor-pointer items-center justify-center rounded-full bg-white text-[14px] leading-none font-bold text-ink shadow-[0_1px_4px_rgba(20,40,60,.28),inset_0_0_0_1px_rgba(20,40,60,.14)] select-none hover:bg-cream"
+        className="absolute -right-[13px] z-40 flex size-[26px] cursor-pointer items-center justify-center rounded-full bg-white text-[14px] leading-none font-bold text-ink shadow-[0_1px_4px_rgba(20,40,60,.28),inset_0_0_0_1px_rgba(20,40,60,.14)] select-none hover:bg-cream"
+        style={{ top: 'calc(var(--spacing-header) - 13px)' }}
       >
         {collapsed ? '›' : '‹'}
       </button>
