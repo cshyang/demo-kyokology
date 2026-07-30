@@ -17,8 +17,16 @@
  * it silently kept the old value when the token moved to the brand's.
  *
  * Light mode only, per the design spec. Do not add a dark variant.
+ *
+ * `static`, and it is load-bearing. Tailwind only emits the custom properties
+ * for theme values some utility class actually referenced, and half of this
+ * palette is consumed by `token()` inside inline styles instead — colours that
+ * arrive from data can't be class names. Without `static`, `--color-sky` and
+ * `--color-stone` were never emitted, so `var(--color-sky)` resolved to nothing
+ * and every band drawn in them rendered transparent: the DEVELOPING band holds
+ * 62% of the cohort on Readiness and was invisible.
  */
-@theme {
+@theme static {
   /*
    * ── Brand ────────────────────────────────────────────────────────────────
    * Exact matches to the KYKOLOGY print palette (the one carrying CMYK and
