@@ -5,12 +5,18 @@ next-env.d.ts
 *.tsbuildinfo
 out/
 
-# Secrets — never commit. .env.local holds the Cloudflare API token locally;
-# a stray `git add .` here would leak it to a PUBLIC repo.
+# Secrets — never commit. .env.local holds the Cloudflare API token and the
+# model API key locally; a stray `git add .` here would leak it to a PUBLIC repo.
 .env*
+# Same, for `wrangler dev`, which reads .dev.vars rather than .env.local and so
+# is NOT covered by the pattern above.
+.dev.vars
 
 # Visual-diff captures live in the session scratchpad, not the repo.
 .playwright-mcp/
+
+# wrangler's local state for `wrangler dev` — a cache, rebuilt on demand.
+.wrangler/
 
 # Claude Code session state: worktrees, scratchpads. A `git add -A` would
 # otherwise sweep in the nested worktree git repo as an embedded submodule.

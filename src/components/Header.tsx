@@ -1,9 +1,11 @@
+import { AskButton } from './AskDrawer'
 import { QuickInvite } from './QuickInvite'
 
 /**
  * Header order is fixed by the design: filters, then "Invite someone", then
- * whatever the screen adds (New campaign, ← Back). Invite is unconditional —
- * it is the one action available from anywhere, so it does not belong to a page.
+ * whatever the screen adds (New campaign, ← Back). Invite and Ask are
+ * unconditional — they are the actions available from anywhere, so they do not
+ * belong to a page.
  */
 export function Header({
   title,
@@ -26,6 +28,7 @@ export function Header({
       </div>
       <div className="ml-auto flex max-w-[70%] flex-none flex-wrap items-center justify-end gap-2">
         {filters}
+        <AskButton />
         <QuickInvite />
         {children}
       </div>

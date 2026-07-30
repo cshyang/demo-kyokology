@@ -2,12 +2,33 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kykology-admin-demo",
   "compatibility_date": "2026-07-01",
+  // The same Worker as before, no longer assets-only. It exists solely to hold
+  // the model API key, which a static bundle cannot. `worker/index.ts` hands
+  // every path except /api/ask straight back to the assets binding.
+  "main": "./worker/index.ts",
   "assets": {
     "directory": "./out",
+    // Required for the fallthrough: without a binding the Worker has no way to
+    // serve the exported HTML, and adding one endpoint would break every route.
+    "binding": "ASSETS",
+    // Scopes *when* the Worker goes first. Without this the POST would be
+    // matched against the asset manifest, miss, and be answered by
+    // not_found_handling below — an HTML 404 in reply to a fetch, which reads
+    // as a broken endpoint rather than a routing mistake.
+    "run_worker_first": ["/api/*"],
     // Each route exports a real .html file, so serve those directly and fall
     // back to the exported 404 page. Do NOT use "single-page-application"
     // here — that would return index.html with a 200 for every unknown path,
     // and a demo that never 404s hides broken links rather than showing them.
     "not_found_handling": "404-page"
-  }
+  },
+  // A public demo URL is a public endpoint. Generous for one presenter asking
+  // questions, and the ceiling on what a script can spend in a minute.
+  "ratelimits": [
+    {
+      "name": "ASK_LIMIT",
+      "namespace_id": "1001",
+      "simple": { "limit": 15, "period": 60 }
+    }
+  ]
 }

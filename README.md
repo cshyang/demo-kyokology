@@ -17,6 +17,20 @@ npm test        # the generator gate — see below
 npm run build   # static export to out/
 ```
 
+**To work on the Ask drawer** you need the Worker too, because `output: 'export'` forbids
+route handlers, so `/api/ask` does not exist under `npm run dev`:
+
+```bash
+echo "ZAI_API_KEY=..." > .dev.vars                          # gitignored
+echo "NEXT_PUBLIC_ASK_API=http://localhost:8788/api/ask" > .env.development.local
+npx wrangler dev --port 8788                                # alongside npm run dev
+```
+
+`.env.development.local`, never `.env.local` — `NEXT_PUBLIC_*` is inlined at build time and
+`next build` reads `.env.local`, so a stray localhost value there ships a demo that calls the
+presenter's own laptop. Or skip both and run `npm run build && npx wrangler dev`, which serves
+the export and the Worker on one origin exactly as production does.
+
 ## The one rule
 
 **Do not refactor `buildData()` in `src/lib/data/generator.ts`.**
@@ -57,6 +71,10 @@ while the code still looks correct.
 | `/templates` | The three messages, with a live preview |
 | `/t?id=&status=&from=` | **Student link.** The row's state beside what that student sees — consent, 36 items, live scoring |
 
+**Ask** is not a screen. It is a drawer available from every header, and it docks rather than
+floats — the answer is only worth trusting next to the figures it came from, so covering them
+would defeat the point.
+
 ## Architecture
 
 ```
@@ -65,9 +83,45 @@ while the code still looks correct.
  src/lib/data/layers.ts      facets, bands, pressure, watch-outs, engagement — all downstream
  src/lib/data/readiness.ts   five educator reads over the facet layer — cohort-level, pure
  src/lib/data/questions.ts   the 36-item bank, 6 per dimension
+ src/lib/data/query-schema.ts  the Ask contract — closed vocabulary + validator, zero imports
+ src/lib/data/query.ts       runs a validated query against the cohort, in the browser
  src/lib/demo-state.tsx      React context — every mutation the demo allows
+ src/lib/ask-state.tsx       the Ask transcript — the one thing that survives a reload
  src/app/(admin)/            every screen, including the student link at /t
+ worker/index.ts             the only server: holds the API key, holds nothing else
 ```
+
+**Ask answers two kinds of question, and only two.** Ask about *this cohort* and the model
+returns a `QuerySpec` over a closed vocabulary, which the browser runs through the same
+`derive.ts` and `readiness.ts` functions the screens render from. Ask about *the instrument* —
+the six dimensions, the DEPTH pathway, what the report may not be used for — and it answers in
+prose from `PRODUCT_BRIEF`, transcribed from the product fact sheet. Anything else is refused.
+
+**The two halves have different safety properties, and the fence between them is the design.**
+On the cohort side the model never sees a student and never emits a figure, so an invented name
+or count is structurally impossible; the framing sentence it writes is stripped if it contains
+a digit, because it is composed *before* the query runs and cannot know the count. On the
+explain side the prose is the model's own, held to the truth only by the briefing being its
+sole permitted source — which is why explain answers are barred from mentioning the cohort at
+all. Every question about *who* or *how many* routes to a query.
+
+Three consequences worth knowing. Z.ai's `response_format` enforces JSON but not shape, so
+`parseAsk` is load-bearing: it rejects outright and never partially applies. The model can
+still map an intent to the wrong *valid* filter, which is why every answer prints the resolved
+rule (`BUSINESS · TOP 20 BY LEADERSHIP POTENTIAL`) — that line is the only thing making a
+mis-read visible mid-demo. And failures show one graceful message with the technical reason on
+hover, because `not valid JSON` reached the screen once during testing, which is exactly where
+it must never appear.
+
+**The current screen is sent as orientation, not as a filter.** It resolves "who needs support
+*here*?" against the page you are on. It does not restrict the answer — any faculty, intake or
+wave is still reachable from anywhere. Live filter *values* are not sent yet: those sit in each
+page's own `useState`, so passing them needs the filter lifted into shared state.
+
+**The transcript persists, deliberately breaking the reset-on-reload rule below.**
+`sessionStorage` is what makes both true: the thread survives a refresh and a page change and
+dies with the tab. It stores the question and the spec, never the rendered rows, so a
+rehydrated answer re-runs against the live cohort instead of going stale.
 
 **Mutations live in React context, never module scope.** Client components render on the
 server too, so a module-level mutable store would be shared across every viewer of the
@@ -92,8 +146,14 @@ regardless of specificity, so an unlayered `a { color: teal }` silently beats
 
 ```bash
 npm run build
+npx wrangler secret put ZAI_API_KEY   # once, per environment
 npx wrangler deploy
 ```
+
+**Before the demo URL is public, cap the spend.** The endpoint is unauthenticated by
+definition, so the URL *is* the credential — a Worker secret hides the key but does not stop
+anyone from spending it. `ratelimits` in `wrangler.jsonc` bounds the rate; only a provider-side
+spend limit bounds the bill.
 
 Static export to Cloudflare Workers static assets — free plan, no adapter. See the comment
 in `next.config.ts` for the constraint this imposes and the one-line change that lifts it
