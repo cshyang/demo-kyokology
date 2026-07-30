@@ -315,9 +315,9 @@ export default function FingerprintPage() {
             </section>
 
             <section className="flex-none rounded-[10px] border border-ink/10 bg-white p-[18px_20px]">
-              <h2 className="text-[13px] leading-none font-bold text-ink">Archetype distribution</h2>
+              <h2 className="text-[13px] leading-none font-bold text-ink">Career motivation distribution</h2>
               <p className="mt-1.5 text-[11.5px] leading-[1.4] text-ink/50">
-                The two leading dimensions, unordered — 15 possible labels.
+                The two leading dimensions, unordered — 15 possible pairings.
               </p>
               <div className="mt-3">
                 {v.archRows.map((a, i) => (
@@ -326,7 +326,7 @@ export default function FingerprintPage() {
                     <div className="h-[7px] flex-1 overflow-hidden rounded-[4px] bg-line">
                       <div
                         className="chart-bar h-full rounded-[4px] bg-slate opacity-80 group-hover:opacity-100"
-                        /* 25ms, not 50: this list runs to fifteen archetypes, and a
+                        /* 25ms, not 50: this list runs to fifteen pairings, and a
                            per-row delay tuned for six would leave the last bar starting
                            three-quarters of a second after the first. */
                         style={{ width: `${a.w}%`, animationDelay: `${i * 25}ms` }}

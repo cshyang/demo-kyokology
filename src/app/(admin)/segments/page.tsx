@@ -65,11 +65,10 @@ export default function SegmentsPage() {
   const lead =
     `${flagged} of ${total} assessed students match a flagged pattern — ` +
     `${Math.round((flagged / (total || 1)) * 100)}%, each with a named next step. ` +
-    `${counts.steady} (${steadyPct}%) sit in Steady Core and need nothing: ` +
-    `a system that flags everyone is crying wolf.`
+    `${counts.steady} (${steadyPct}%) sit in Steady Core and need nothing.`
 
   function exportCsv() {
-    const head = ['Student', 'Faculty', 'Intake', 'Archetype', ...data.SHORT, 'Consent']
+    const head = ['Student', 'Faculty', 'Intake', 'Career motivation', ...data.SHORT, 'Consent']
     const body = rows.map((r) => [
       r.st.name,
       r.st.faculty,
@@ -153,8 +152,7 @@ export default function SegmentsPage() {
           </div>
 
           <p className="mt-[14px] text-[11.5px] leading-[1.5] text-ink/50">
-            {steadyPct}% sit in Steady Core and need nothing — a system that flags everyone is crying wolf.
-            Denominator: {denom}.
+            {steadyPct}% sit in Steady Core and need nothing. Denominator: {denom}.
           </p>
         </section>
 
@@ -174,7 +172,7 @@ export default function SegmentsPage() {
             <div>STUDENT</div>
             <div>FACULTY</div>
             <div>INTAKE</div>
-            <div>ARCHETYPE</div>
+            <div>MOTIVATION</div>
             {data.T.map((t) => (
               <div key={t} className="text-center">
                 {t.toUpperCase()}

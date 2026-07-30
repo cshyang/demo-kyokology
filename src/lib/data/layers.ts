@@ -486,8 +486,6 @@ export function qualityRollup(data: DemoData): QualityRollup {
 // The whole profile, assembled
 // ─────────────────────────────────────────────────────────────────────────────
 
-const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1)
-
 const SEG_ACTION: Record<string, string | null> = {
   silent: 'structured role assignment in group work',
   driven: 'an early check-in and workload pacing',
@@ -616,7 +614,7 @@ export function profileLayers(
     // The design reads "once, in <date>"; "on" is the correct preposition for a
     // single day, and it is the only word here that is not the design's.
     (n === 1 ? `once, on ${cur.date}` : `${n} times between ${first.date} and ${series[n - 1].date}`) +
-    `. Their profile reads as ${cur.arch} — ${lowerFirst(ARCHNOTE[cur.arch] ?? '')} ` +
+    `. Their top career motivations are ${cur.arch} — they ${ARCHNOTE[cur.arch] ?? ''} ` +
     (seg.id === 'steady'
       ? 'All six dimensions sit in the healthy middle band: nothing here calls for action.'
       : segAction
@@ -626,7 +624,7 @@ export function profileLayers(
   const archMove = !prevW
     ? ''
     : prevW.arch !== cur.arch
-      ? `Moved from ${prevW.arch} at assessment ${prevW.n}. Labels only change when the second dimension leads the third by 8 points or more.`
+      ? `Moved from ${prevW.arch} at assessment ${prevW.n}. These shift only when the second dimension leads the third by 8 points or more.`
       : `Unchanged since assessment ${prevW.n}.`
 
   const nextLine =

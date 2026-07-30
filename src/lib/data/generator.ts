@@ -85,29 +85,49 @@ export function buildData() {
     { name: 'Health', mean: [54, 60, 70, 58, 50, 58] },
   ]
   const YEARS = [2024, 2025, 2026]
+  /*
+   * The two leading dimensions, named as career motivations rather than as a
+   * personality type.
+   *
+   * "The Strategist" was a verdict on a person, and it sat as the 30px H1 of
+   * their profile. These name what the work has to offer instead — one word per
+   * dimension, used consistently, so a pair reads as its two drivers rather than
+   * as a label to live up to: sa Mastery · e Leadership · so Service ·
+   * se Structure · c Discovery · sp Meaning.
+   *
+   * All fifteen must stay distinct. Archetype churn counts labels that changed
+   * between waves, so collapsing two pairs onto one string would silently drop
+   * the published churn figure.
+   */
   const ARCH: Record<string, string> = {
-    '0,1': 'The Strategist', '0,2': 'The Convener', '0,3': 'The Architect',
-    '0,4': 'The Systems Thinker', '0,5': 'The Philosopher', '1,2': 'The Empath',
-    '1,3': 'The Steward', '1,4': 'The Sense-Maker', '1,5': 'The Seeker',
-    '2,3': 'The Community Builder', '2,4': 'The Bridge', '2,5': 'The Servant Leader',
-    '3,4': 'The Navigator', '3,5': 'The Custodian', '4,5': 'The Visionary',
+    '0,1': 'Mastery & Leadership', '0,2': 'Mastery & Service', '0,3': 'Mastery & Structure',
+    '0,4': 'Mastery & Discovery', '0,5': 'Mastery & Meaning', '1,2': 'Leadership & Service',
+    '1,3': 'Leadership & Structure', '1,4': 'Leadership & Discovery', '1,5': 'Leadership & Meaning',
+    '2,3': 'Service & Structure', '2,4': 'Service & Discovery', '2,5': 'Service & Meaning',
+    '3,4': 'Structure & Discovery', '3,5': 'Structure & Meaning', '4,5': 'Discovery & Meaning',
   }
+  /*
+   * Verb phrases, deliberately. Each says what a student is drawn toward, never
+   * how they behave — "want work that rewards deep skill", not "designs the
+   * system before touching it". They render after "they", so they start
+   * lowercase and stay subject-less.
+   */
   const ARCHNOTE: Record<string, string> = {
-    'The Strategist': 'Clear thinking paired with real self-awareness.',
-    'The Convener': 'Turns understanding into shared direction.',
-    'The Architect': 'Designs the system before touching it.',
-    'The Systems Thinker': 'Sees the whole board and its second moves.',
-    'The Philosopher': 'Reasons from first principles toward meaning.',
-    'The Empath': 'Reads people accurately and acts on it.',
-    'The Steward': 'Regulates themselves so others can rely on them.',
-    'The Sense-Maker': 'Holds nuance without losing their footing.',
-    'The Seeker': 'Inward-facing, driven by questions of purpose.',
-    'The Community Builder': 'Makes groups feel safe enough to do the work.',
-    'The Bridge': 'Connects people across difference and complexity.',
-    'The Servant Leader': 'Serves the group from a settled sense of why.',
-    'The Navigator': 'Keeps a plan while conditions change.',
-    'The Custodian': 'Protects what matters and the people in it.',
-    'The Visionary': 'Comfortable in ambiguity, anchored in meaning.',
+    'Mastery & Leadership': 'want work that rewards deep skill and gives them people to lead.',
+    'Mastery & Service': 'want to get good at something that visibly helps people.',
+    'Mastery & Structure': 'are drawn to craft, high standards, and work that holds up.',
+    'Mastery & Discovery': 'want room to learn hard things and follow the questions out.',
+    'Mastery & Meaning': 'want growth that adds up to something worth having done.',
+    'Leadership & Service': 'want responsibility for people, not only for outcomes.',
+    'Leadership & Structure': 'are drawn to running things that have to work reliably.',
+    'Leadership & Discovery': 'want to build something new and be accountable for it.',
+    'Leadership & Meaning': 'want influence in service of a cause they can name.',
+    'Service & Structure': 'want to look after people through dependable systems.',
+    'Service & Discovery': 'are drawn to human problems that need a new approach.',
+    'Service & Meaning': 'want work whose value to other people is the whole point.',
+    'Structure & Discovery': 'want difficult problems and the time to get them right.',
+    'Structure & Meaning': 'are drawn to stewardship of what matters, done carefully.',
+    'Discovery & Meaning': 'want open questions that matter beyond the immediate.',
   }
 
   // mulberry32 — the seed and the call order below are load-bearing.

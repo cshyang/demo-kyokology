@@ -11,7 +11,7 @@ import { tint, token } from '@/lib/color'
 const STEPS = ['Test', 'Audience', 'Emails', 'Review'] as const
 
 const TESTS = [
-  { id: '6d', name: '6D Profile', dims: 6, q: 100, note: 'The full Campus instrument. 100 questions across six dimensions, archetype label, segment rules.' },
+  { id: '6d', name: '6D Profile', dims: 6, q: 100, note: 'The full Campus instrument. 100 questions across six dimensions, career motivations, segment rules.' },
   { id: 'entry', name: '6D Entry Check', dims: 6, q: 18, note: 'Short onboarding form — three items per dimension. Not the full Campus report.' },
   { id: 'team', name: 'Team Readiness', dims: 3, q: 14, note: 'Collaboration subset for project cohorts — three dimensions only. Not a standalone report.' },
 ]

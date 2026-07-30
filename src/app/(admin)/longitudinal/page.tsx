@@ -8,8 +8,8 @@ import { facultyDeltas, migration, migrationHeadline, topMovers, type CentredBar
 /** Built from live values, not pasted: the design's lead reports the numbers it is sitting above. */
 const lead = (out: number, n: number, mover: string, txt: string, churnPct: number) =>
   `Between the two assessments, ${out} of ${n} Silent Contributors moved out of the pattern, and the ` +
-  `single biggest shift was ${mover.toLowerCase()} at ${txt} points. Labels stayed put: archetype churn ` +
-  `was ${churnPct}% against an 8% ceiling.`
+  `single biggest shift was ${mover.toLowerCase()} at ${txt} points. Career motivations stayed put: ` +
+  `churn was ${churnPct}% against an 8% ceiling.`
 
 /** A bar drawn from the centre line: right for a rise, left for a fall. */
 function Bar({ bar, height = 16 }: { bar: CentredBar; height?: number }) {
@@ -130,7 +130,7 @@ export default function LongitudinalPage() {
           <div className="flex items-baseline gap-3">
             <h2 className="text-[13px] leading-none font-bold text-ink">Pattern migration</h2>
             <span className="eyebrow ml-auto text-[10.5px] tracking-normal text-ink/45">
-              ARCHETYPE CHURN {data.churnPct}% · CEILING 8%
+              MOTIVATION CHURN {data.churnPct}% · CEILING 8%
             </span>
           </div>
           <div className="mt-4 grid grid-cols-3 gap-3">

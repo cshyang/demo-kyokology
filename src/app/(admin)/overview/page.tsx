@@ -15,7 +15,7 @@ const ACTIVITY = [
   { when: '28 OCT 2026', lead: '96 invites unanswered after 5 days', rest: ' · reminder rule fired · Oct 2026 mid-flight', href: '/campaigns/C' },
   { when: '21 OCT 2026', lead: 'Oct 2026 mid-flight campaign sent', rest: ' · 280 invites · 2026 intake', href: '/campaigns/C' },
   { when: '19 OCT 2026', lead: 'Oct 2026 retest closed', rest: ' · 291 of 560 completed', href: '/campaigns/B' },
-  { when: '6 OCT 2026', lead: 'Oct 2026 re-assessment scored', rest: ' · archetype churn 0.3% against the 8% ceiling', href: '/longitudinal' },
+  { when: '6 OCT 2026', lead: 'Oct 2026 re-assessment scored', rest: ' · career-motivation churn 0.3% against the 8% ceiling', href: '/longitudinal' },
 ]
 
 function Panel({ className = '', children }: { className?: string; children: React.ReactNode }) {

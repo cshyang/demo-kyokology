@@ -22,7 +22,7 @@ npm run build   # static export to out/
 **Do not refactor `buildData()` in `src/lib/data/generator.ts`.**
 
 It is a verbatim transliteration of the Claude Design prototype. Every published figure —
-the seven segment counts, the archetype churn, the funnel quotas — is a function of the
+the seven segment counts, the career-motivation churn, the funnel quotas — is a function of the
 mulberry32 stream seeded at `0x4B59A71D` *and the exact order `rnd()` is called in*.
 Extracting a helper or reordering a loop silently changes every number on the hero screen
 while the code still looks correct.
@@ -46,7 +46,7 @@ while the code still looks correct.
 | Route | What it is |
 |---|---|
 | `/overview` | KPIs, five October checkpoints, the post-assessment funnel, fingerprint bars, activity, population waffle |
-| `/fingerprint` | Six-axis radar, faculty separation, archetype distribution |
+| `/fingerprint` | Six-axis radar, faculty separation, career motivation distribution |
 | `/segments` | **The hero.** Six flagged patterns with attached actions, plus the roster |
 | `/readiness` | The educator view — five cohort reads (leadership, team, resilience, workplace, pressure) as band distributions |
 | `/longitudinal` | Dimension movement, the "22 of 55 moved out" headline, pattern migration |

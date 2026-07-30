@@ -9,7 +9,7 @@ Compared against: this repo at `a48846a` — `generator.ts` data model, `/studen
 
 **These are two different products that share six words.**
 
-The report is built on facets, capabilities, contribution families and pressure states. The platform is built on dimensions, archetypes, segments and waves. Neither construct appears in the other.
+The report is built on facets, capabilities, contribution families and pressure states. The platform is built on dimensions, career motivations, segments and waves. Neither construct appears in the other.
 
 ```
 REPORT                          PLATFORM
@@ -26,7 +26,7 @@ blind spot per dimension        —
 opportunity arenas              —
 DEPTH reflection ×5             —
 30-day plan + evidence tracker  —
-—                               15 archetypes (top-2 dims)
+—                               15 career motivations (top-2 dims)
 —                               6 segment rules + attached actions
 —                               waves, deltas, migration
 —                               faculty & university norms
@@ -261,7 +261,7 @@ None is a build question. All four need KYKOLOGY to answer.
 1. **Whose facet taxonomy wins?** (§1.3, §10) — the one the design does not address. Either the item bank gets rewritten to the report's 36 facet names, or the report adopts the constructs the bank measures. Until then every facet band on Egocentricity is a label the instrument cannot support.
 2. **Is the evidence real?** (§1.4) — if yes, the platform needs an evidence-capture surface and that changes the profile's information architecture. If no, the capabilities section is inference and must be labelled as such.
 3. **Where does Shadow surface?** (§1.7, §10) — settled as canonical vocabulary by the design's `GAPS.md`, so it is measured and simply not shown. It needs its own consent model before it appears anywhere.
-4. **Do the archetypes stay?** (§10) — the report never names one, and "The Strategist" reads as a verdict in a product that insists it is not giving one.
+4. ~~**Do the archetypes stay?**~~ — ✅ **answered, 30 Jul 2026.** They do not. The 15 invented person-labels became career-motivation pairings, named from the same top-two dimensions: `sa` Mastery · `e` Leadership · `so` Service · `se` Structure · `c` Discovery · `sp` Meaning. "The Strategist" is now "Mastery & Leadership", and the accompanying note says what a student is drawn toward rather than how they behave — *"want work that rewards deep skill and gives them people to lead"*, not *"clear thinking paired with real self-awareness"*. The label no longer names a kind of person, which is what made it read as a verdict. Churn holds at 0.3% because all 15 remain distinct.
 
 ---
 
@@ -324,7 +324,7 @@ After this analysis was written, the design project (`Kykology 6D Admin.dc.html`
 **It settles two of §7's open questions:**
 
 - **Shadow is canonical** (§1.7 asked whether it exists). `GAPS.md` corrects an earlier draft of its own: *"The report states explicitly that Healthy, Shadow, and Dynamic results remain separate interpretive layers and are never averaged into one score. Shadow is canonical vocabulary. Keep it."* So the footnote is not a leftover — the layer is real and simply not shown. §1.7 stands as "measured but not rendered", not "delete the footnote".
-- **The archetype layer is the client question**, not Shadow. The report never names an archetype; it leads with "top three Behavioural Intelligences". The platform's 15 labels ("The Strategist") were invented here, and they are verdict-flavoured in a product that repeatedly insists it is *"a starting map, not a verdict."* That tension is now documented on both sides.
+- **The archetype layer is the client question**, not Shadow. The report never names an archetype; it leads with "top three Behavioural Intelligences". The platform's 15 labels ("The Strategist") were invented here, and they are verdict-flavoured in a product that repeatedly insists it is *"a starting map, not a verdict."* **Resolved on 30 Jul 2026** — see §7.4. The pairings survive as career motivations; the person-labels do not.
 
 **It supersedes three of my recommendations:**
 
