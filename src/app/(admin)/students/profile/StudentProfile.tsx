@@ -175,7 +175,10 @@ export function StudentProfile({ id }: { id: string }) {
                     fill: p.me ? '#fff' : p.inside ? v.rule.color : tint('ink', 16),
                     stroke: p.me ? token('ink') : 'none',
                   }}
-                  strokeWidth={p.me ? 2 : 0}
+                  // An SVG stroke straddles the radius, so 2 units on r=2.6 left
+                  // a 1.6-unit core inside a 2-unit ring and the marker read as a
+                  // blob. 1 keeps the same footprint with a hole you can see.
+                  strokeWidth={p.me ? 1 : 0}
                 />
               ))}
             </svg>
