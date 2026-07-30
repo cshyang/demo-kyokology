@@ -106,6 +106,13 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     if (request.method !== 'POST') return json({ error: 'POST only' }, 405)
 
+    // A missing secret is a deployment step, not a model failure. Without this
+    // the key goes upstream as `undefined`, Z.ai answers 401 "token expired or
+    // incorrect", and the drawer reports an expired key that was never set.
+    if (!env.ZAI_API_KEY) {
+      return json({ error: 'Ask is not configured on this deployment (no ZAI_API_KEY secret).' }, 503)
+    }
+
     if (env.ASK_LIMIT) {
       const key = request.headers.get('cf-connecting-ip') ?? 'anonymous'
       const { success } = await env.ASK_LIMIT.limit({ key })
