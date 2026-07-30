@@ -50,6 +50,7 @@ export default function PeoplePage() {
   const [fac, setFac] = useState('All')
   const [yr, setYr] = useState('All')
   const [done, setDone] = useState<Done>('all')
+  const [pattern, setPattern] = useState('All')
   const [q, setQ] = useState('')
   const [importOpen, setImportOpen] = useState(false)
   const [paste, setPaste] = useState(SAMPLE)
@@ -75,7 +76,8 @@ export default function PeoplePage() {
   /**
    * Imported people sit above the roster, not inside it — they have no faculty,
    * no intake and no baseline, so they would sort into a gap otherwise. They drop
-   * out entirely once you search or ask for people who already have a profile.
+   * out entirely once you search, ask for people who already have a profile, or
+   * ask for a behavioural pattern — a pattern implies a record, and they have none.
    */
   const { rows, matched, more } = useMemo(() => {
     const needle = q.trim().toLowerCase()
@@ -85,13 +87,18 @@ export default function PeoplePage() {
     const roster = data.students.filter((st) => {
       if (fac !== 'All' && st.faculty !== fac) return false
       if (yr !== 'All' && String(st.intakeYear) !== yr) return false
-      const assessed = !!(data.w2[st.id] || data.w3[st.id])
+      // The same expression the PATTERN column renders from, deliberately — a
+      // filter reading a different record than the column it filters would
+      // disagree with the screen it is standing on.
+      const rec = data.w2[st.id] ?? data.w3[st.id]
+      if (pattern !== 'All' && rec?.seg !== pattern) return false
+      const assessed = !!rec
       if (done === 'done' && !assessed) return false
       if (done === 'none' && assessed) return false
       return hit(st)
     })
 
-    const fresh = needle || done === 'done' ? [] : newPeople.filter(hit)
+    const fresh = needle || done === 'done' || pattern !== 'All' ? [] : newPeople.filter(hit)
     const matched = roster.length + fresh.length
     return {
       matched,
@@ -101,7 +108,7 @@ export default function PeoplePage() {
         ...roster.slice(0, 60).map((st) => ({ isNew: false as const, person: st })),
       ],
     }
-  }, [data, newPeople, fac, yr, done, q])
+  }, [data, newPeople, fac, yr, done, pattern, q])
 
   function runImport() {
     const toAdd = dedupe === 'skip' ? fresh : parsed.rows.filter((r) => !existingEmails.has(r.email.toLowerCase()))
@@ -222,14 +229,39 @@ export default function PeoplePage() {
           </section>
         )}
 
-        <div className="max-w-[360px] flex-none">
+        {/*
+          The pattern filter sits here rather than in the header for two reasons.
+          A fifth control wrapped the header row and pushed "Invite someone" onto
+          a second line, and a select sizes itself to its widest option — "Driven,
+          Under-Regulated" is wide. It also belongs next to search: both narrow
+          the list you are looking at, where the three header selects scope the
+          cohort. Segments already lists each pattern; this exists because only
+          People holds email and the invite button, so "this pattern, not yet
+          reached" is answerable here and nowhere else.
+        */}
+        <div className="flex flex-none items-center gap-2.5">
           <input
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={`Search ${everyone.length} people by name or email`}
-            className="w-full rounded-[7px] border border-ink/16 bg-white p-[10px_12px] text-[12.5px] font-bold text-ink"
+            className="w-full max-w-[360px] rounded-[7px] border border-ink/16 bg-white p-[10px_12px] text-[12.5px] font-bold text-ink"
           />
+          <select
+            className={`${SELECT} py-2.5`}
+            value={pattern}
+            onChange={(e) => setPattern(e.target.value)}
+          >
+            <option value="All">All patterns</option>
+            {data.SEGS.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
+          {pattern !== 'All' && (
+            <span className="font-mono text-[10.5px] leading-none text-ink/45">
+              IMPORTED PEOPLE HIDDEN — A PATTERN NEEDS A PROFILE
+            </span>
+          )}
         </div>
 
         <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-ink/10 bg-white">
