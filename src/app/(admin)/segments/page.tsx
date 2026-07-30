@@ -39,6 +39,71 @@ export default function SegmentsPage() {
   const rows = useMemo(() => recs.filter((r) => r.seg === selected), [recs, selected])
   const selName = data.SEGS.find((s) => s.id === selected)!.name
 
+  /**
+   * Roster sort. Hand-rolled rather than a table library: at 139 rows for the
+   * largest segment this is a comparator and a click handler, and nothing here
+   * needs virtualisation, grouping or column resizing. See the note on
+   * `sortable` below for why the default is deliberately unsorted.
+   */
+  const [sort, setSort] = useState<{ key: string; dir: 1 | -1 } | null>(null)
+
+  const sorted = useMemo(() => {
+    if (!sort) return rows
+    const value = (r: (typeof rows)[number]): string | number => {
+      switch (sort.key) {
+        case 'name':
+          return r.st.name
+        case 'faculty':
+          return r.st.faculty
+        case 'intake':
+          return r.st.intakeYear
+        case 'arch':
+          return r.arch
+        // "11 Oct 2026" sorts wrongly as text — May would precede October.
+        case 'consent':
+          return Date.parse(r.at) || 0
+        default:
+          return r.sc[sort.key as keyof typeof r.sc]
+      }
+    }
+    return [...rows].sort((a, b) => {
+      const x = value(a)
+      const y = value(b)
+      const d = typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y))
+      return d * sort.dir
+    })
+  }, [rows, sort])
+
+  /** Third click clears rather than cycling back to ascending — the generator's own order carries meaning. */
+  const toggleSort = (key: string) =>
+    setSort((prev) =>
+      prev?.key !== key ? { key, dir: 1 } : prev.dir === 1 ? { key, dir: -1 } : null,
+    )
+
+  /**
+   * A plain function, not a component, so React does not see a fresh component
+   * type on every render and remount all eleven headers.
+   *
+   * The arrow's slot is reserved whether or not it is showing, because a header
+   * row eleven columns wide visibly jolts sideways otherwise.
+   */
+  const sortable = (key: string, label: string, center = false) => {
+    const active = sort?.key === key
+    return (
+      <button
+        key={key}
+        onClick={() => toggleSort(key)}
+        title={`Sort by ${label.toLowerCase()}`}
+        className={`flex cursor-pointer items-center gap-[3px] font-semibold tracking-[.1em] uppercase ${
+          center ? 'justify-center' : ''
+        } ${active ? 'text-ink' : 'hover:text-ink/70'}`}
+      >
+        {label}
+        <span className="inline-block w-[5px] text-left">{active ? (sort.dir === 1 ? '↑' : '↓') : ''}</span>
+      </button>
+    )
+  }
+
   const flagged = total - counts.steady - counts.unflagged
   const steadyPct = Math.round((counts.steady / (total || 1)) * 100)
   const sumLine = `${data.SEGS.map((s) => counts[s.id]).join(' + ')} = ${total}`
@@ -69,7 +134,7 @@ export default function SegmentsPage() {
 
   function exportCsv() {
     const head = ['Student', 'Faculty', 'Intake', 'Career motivation', ...data.SHORT, 'Consent']
-    const body = rows.map((r) => [
+    const body = sorted.map((r) => [
       r.st.name,
       r.st.faculty,
       String(r.st.intakeYear),
@@ -156,7 +221,14 @@ export default function SegmentsPage() {
           </p>
         </section>
 
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[10px] border border-ink/10 bg-white">
+        {/*
+          The min-height is load-bearing. `flex-1` inside a scrolling flex column
+          divides the space left over rather than claiming its natural height, so
+          on a shorter viewport the tiles above took nearly all of it and this
+          roster collapsed to two visible rows. A floor keeps it usable and lets
+          the page scroll to reach it.
+        */}
+        <section className="flex min-h-[320px] flex-1 flex-col overflow-hidden rounded-[10px] border border-ink/10 bg-white">
           <div className="flex flex-none items-center gap-3 border-b border-ink/8 px-[18px] py-[15px]">
             <h2 className="text-[13px] leading-none font-bold text-ink">{selName}</h2>
             <div className="font-mono text-[10.5px] leading-none text-ink/45">{rows.length} STUDENTS</div>
@@ -169,16 +241,12 @@ export default function SegmentsPage() {
           </div>
 
           <div className="grid flex-none gap-2.5 border-b border-ink/8 bg-cream px-[18px] py-2.5 font-mono text-[8.5px] leading-none font-semibold tracking-[.1em] text-ink/42 [grid-template-columns:110px_150px_62px_168px_repeat(6,minmax(0,1fr))_96px]">
-            <div>STUDENT</div>
-            <div>FACULTY</div>
-            <div>INTAKE</div>
-            <div>MOTIVATION</div>
-            {data.T.map((t) => (
-              <div key={t} className="text-center">
-                {t.toUpperCase()}
-              </div>
-            ))}
-            <div>CONSENT</div>
+            {sortable('name', 'STUDENT')}
+            {sortable('faculty', 'FACULTY')}
+            {sortable('intake', 'INTAKE')}
+            {sortable('arch', 'MOTIVATION')}
+            {data.T.map((t) => sortable(t, t.toUpperCase(), true))}
+            {sortable('consent', 'CONSENT')}
           </div>
 
           {/*
@@ -187,7 +255,7 @@ export default function SegmentsPage() {
             only clue that anything happened is the row count.
           */}
           <div key={selected} className="chart-appear min-h-0 flex-1 overflow-auto">
-            {rows.map(({ st, sc, arch, at }) => (
+            {sorted.map(({ st, sc, arch, at }) => (
               <div
                 key={st.id}
                 onClick={() => router.push(`/students/profile?id=${st.id}`)}
