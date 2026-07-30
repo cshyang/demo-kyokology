@@ -133,7 +133,7 @@ test('the tiles move when the cohort is filtered', () => {
   const eng = tilesOf(rows.filter((r) => data.byId[r.id].faculty === 'Engineering'))
   const health = tilesOf(rows.filter((r) => data.byId[r.id].faculty === 'Health'))
   const y2026 = tilesOf(rows.filter((r) => data.byId[r.id].intakeYear === 2026))
-  // Team compatibility is the widest faculty separation on the page.
+  // Collaborative spirit is the widest faculty separation on the page.
   assert.equal(eng.team.headline, 'DEVELOPING or below for 74% of 91')
   assert.equal(health.team.headline, 'DEVELOPING or below for 42% of 85')
   // The 2026 intake is the page's headline story: worst on four of five reads.
@@ -191,7 +191,7 @@ test('every band count is reproducible by filtering rows through bandOf', () => 
 
 test('every tile carries the facet names it is built from', () => {
   const t = tilesOf(readinessOf(data, 'latest'))
-  // Team compatibility correlates 0.98 with Sociocentricity. That is deliberate,
+  // Collaborative spirit correlates 0.98 with Sociocentricity. That is deliberate,
   // and printing its three facet names on the tile is how it is disclosed.
   assert.deepEqual(t.team.facetNames, [
     'Collaboration & Teamwork',

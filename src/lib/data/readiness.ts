@@ -11,9 +11,14 @@ import { dynOf, extraWaves, facetsOf, k7s, kband, MAG_LEGEND, waveSeries } from 
  * them on it, so a bundle drawn from one dimension is that dimension renamed.
  * Leadership therefore spans three dimensions (0.69 against its closest) rather
  * than leaning on Egocentricity, whose platform meaning is grievance where the
- * printed report's is agency. Team compatibility deliberately does not span: it
+ * printed report's is agency. Collaborative spirit deliberately does not span: it
  * correlates 0.98 with Sociocentricity because it honestly IS sociocentricity,
  * and manufacturing independence would be inventing a construct to look tidy.
+ *
+ * That read is named "team compatibility and dynamics" on the product fact
+ * sheet. The screen calls it Collaborative spirit; `PRODUCT_BRIEF` still quotes
+ * the sheet verbatim, and the Ask vocabulary carries both so a question asked in
+ * either wording lands on the same read.
  *
  * Every tile prints its own facet names, so this is disclosed on screen rather
  * than buried here. See the spec's §3.2.
@@ -43,8 +48,8 @@ export const READS: readonly Read[] = [
   },
   {
     key: 'team',
-    name: 'Team compatibility & dynamics',
-    short: 'TEAM',
+    name: 'Collaborative spirit',
+    short: 'COLLABORATION',
     blurb: 'How readily a student works through other people rather than around them.',
     facets: [
       ['so', 'Collaboration & Teamwork'],

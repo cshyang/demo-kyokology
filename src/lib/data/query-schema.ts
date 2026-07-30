@@ -147,7 +147,7 @@ QUERY FIELDS for intent "list":
  "rank"?:{"by":${RANK_KEYS.map((k) => `"${k}"`).join('|')},"topN":number},
  "show":(${COLUMNS.map((c) => `"${c}"`).join('|')})[]}
 
-Rank keys: lead=Leadership potential, team=Team compatibility and dynamics, resil=Emotional resilience, work=Workplace readiness, swing=Behaviour under pressure.
+Rank keys: lead=Leadership potential, team=Collaborative spirit (the fact sheet calls this team compatibility and dynamics; both mean this key), resil=Emotional resilience, work=Workplace readiness, swing=Behaviour under pressure.
 
 Segments: silent=Silent Contributors, driven=Driven and Under-Regulated, explorer=Under-stretched Explorers, fragile=Transition Fragile, adrift=Purpose Adrift, steady=Steady Core, unflagged=Unflagged.
 Students needing intervention or support are exactly: ${INTERVENTION_SEGMENTS.join(', ')}.

@@ -30,7 +30,7 @@ const UNMAPPED_NOTE =
   'somewhat different constructs. Leadership potential is the most affected: the platform’s ' +
   'Egocentricity items read as grievance — keeping score, sitting with criticism — where the ' +
   'report reads agency, and no item in the bank asks about persuasion, so Inspiring & Influencing ' +
-  'is carried by items about ambiguity and pattern-finding. Team compatibility is the one read ' +
+  'is carried by items about ambiguity and pattern-finding. Collaborative spirit is the one read ' +
   'with no such gap. All five are provisional until the item bank is written to match the names.'
 
 const GRID =

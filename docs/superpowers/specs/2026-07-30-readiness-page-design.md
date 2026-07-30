@@ -379,3 +379,14 @@ students underneath would only surface mid-demo.
 
 Still not building, unchanged: attached institutional programmes with owners; per-tile faculty
 comparison rows; a separate Pressure tab; contribution supply/demand.
+
+### Renamed: Team compatibility & dynamics → Collaborative spirit
+
+The screen calls the second read **Collaborative spirit**. Everything above keeps the fact sheet's
+name, because that is what the sheet says and this document records what was decided against it.
+
+The divergence is deliberate and worth knowing: `PRODUCT_BRIEF` still quotes the sheet verbatim
+("team compatibility and dynamics"), since misquoting the source to match the UI would defeat the
+point of transcribing it. The Ask vocabulary carries both names against the same `team` key, so a
+question asked in either wording lands on the same read. §3.2's finding is unaffected — the read
+still correlates 0.98 with Sociocentricity under any name.
