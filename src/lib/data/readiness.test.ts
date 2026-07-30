@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { DIMS, buildData, segmentCounts } from './generator.ts'
 import { latest } from './derive.ts'
 import { FACETS, dynOf, extraWaves, facetsOf, waveSeries } from './layers.ts'
-import { READS, readinessOf, tally } from './readiness.ts'
+import { READS, bandOf, readinessOf, tally } from './readiness.ts'
 
 const data = buildData()
 
@@ -157,6 +157,35 @@ test('an empty cohort renders as not-yet-measurable, never NaN', () => {
     assert.equal(t.median, null)
     assert.equal(t.headline, 'NOT YET MEASURABLE')
     for (const b of t.bands) assert.equal(b.pct, 0)
+  }
+})
+
+/**
+ * The bar and the roster share one cut, or the drill-through lies.
+ *
+ * A band drawn 17 wide that lists 19 students underneath is the exact failure
+ * mode the rest of this codebase is arranged to prevent, and it would only show
+ * up mid-demo. Every band a tile draws must be reproducible by filtering the
+ * same rows through `bandOf`.
+ */
+test('every band count is reproducible by filtering rows through bandOf', () => {
+  const rows = readinessOf(data, 'latest')
+  for (const fac of ['All', 'Engineering', 'Health']) {
+    const keep = rows.filter((r) => fac === 'All' || data.byId[r.id].faculty === fac)
+    for (const t of tally(keep)) {
+      let seen = 0
+      for (const b of t.bands) {
+        assert.equal(
+          keep.filter((r) => bandOf(r, t.key) === b.name).length,
+          b.n,
+          `${fac} / ${t.name} / ${b.name}`,
+        )
+        seen += b.n
+      }
+      // No student may fall outside every band — an open-ended top band and a
+      // zero floor are what guarantee it, and this is what proves they do.
+      assert.equal(seen, keep.length, `${fac} / ${t.name} leaves students unbanded`)
+    }
   }
 })
 

@@ -62,7 +62,7 @@ while the code still looks correct.
 | `/overview` | KPIs, five October checkpoints, the post-assessment funnel, fingerprint bars, activity, population waffle |
 | `/fingerprint` | Six-axis radar, faculty separation, career motivation distribution |
 | `/segments` | **The hero.** Six flagged patterns with attached actions, plus the roster |
-| `/readiness` | The educator view — five cohort reads (leadership, team, resilience, workplace, pressure) as band distributions |
+| `/readiness` | The educator view — five cohort reads (leadership, team, resilience, workplace, pressure) as band distributions, each drilling through to a ranked roster |
 | `/longitudinal` | Dimension movement, the "22 of 55 moved out" headline, pattern migration |
 | `/students/profile?id=` | The individual profile — facets, bands, pressure, watch-outs, reflection state, calibration scatter. Reached from People |
 | `/campaigns` · `/campaigns/[id]` | Funnel tracking and the nudge flow |
@@ -81,7 +81,7 @@ would defeat the point.
  src/lib/data/generator.ts   seeded generator — DO NOT REFACTOR
  src/lib/data/derive.ts      aggregates: funnels, migration, waffle, radar inputs
  src/lib/data/layers.ts      facets, bands, pressure, watch-outs, engagement — all downstream
- src/lib/data/readiness.ts   five educator reads over the facet layer — cohort-level, pure
+ src/lib/data/readiness.ts   five educator reads over the facet layer, and the one band cut they share
  src/lib/data/questions.ts   the 36-item bank, 6 per dimension
  src/lib/data/query-schema.ts  the Ask contract — closed vocabulary + validator, zero imports
  src/lib/data/query.ts       runs a validated query against the cohort, in the browser
@@ -133,6 +133,12 @@ without anyone remembering to reset it.
 twelve colours, they are one colour at twelve opacities — so there is a single `--color-ink`
 and the alpha is expressed at the call site (`text-ink/45`, `border-ink/10`). Light mode
 only, by design.
+
+The `@theme` block is `@theme static`, and that word is load-bearing. Tailwind only emits
+custom properties for theme values a utility class referenced, and half this palette is read
+by `token()` inside inline styles instead — a colour arriving from data cannot be a class
+name. Without it `--color-sky` and `--color-stone` were never emitted, so every band drawn
+in them rendered transparent, including the DEVELOPING band holding 62% of the cohort.
 
 IBM Plex Mono appears at four distinct settings and they are not interchangeable — each
 marks a different rank of label. They are four utilities (`eyebrow`, `nav-group`,

@@ -352,3 +352,30 @@ Carried forward onto this page from the profile:
   They place roughly half the cohort in DEVELOPING by construction. That is a property of the
   instrument's calibration against this synthetic cohort, and it is why the tile headline is a
   share rather than a band name.
+
+---
+
+## 12. D1 reversed — 30 July 2026
+
+The re-entry condition fired: *"an educator asks 'so who are they?' more than once"* → drill-through
+from a band to the students in it. D1 stays on the record above, unedited, because its reasoning is
+what makes reversing it legitimate rather than scope drift.
+
+**What shipped is not what §9 predicted, and the difference was measured.** The prediction was
+band → roster. Counting the 5×5 matrix first showed why that alone would fail: averaging three
+facets collapses variance, so of twenty bundle bands unfiltered, leadership VERY STRONG holds
+nobody and resilience STRONG holds one. Under an Engineering filter, seven of twenty hold 0 or 1.
+A presenter clicking a legend chip mid-demo would land on an empty roster.
+
+So the **tile heading** is the primary target — the whole read, ranked weakest first, which is also
+the closer match to the question that prompted this. Bands stay as a secondary cut and render
+unclickable at zero rather than clicking to nothing. Swing is the one read whose bands are evenly
+populated (55 / 165 / 91 / 58), because it is a magnitude rather than a three-facet mean, and it
+inverts the default order: widest first.
+
+One cut function, `bandOf`, now serves both the bar and the roster, with a test asserting every
+band count is reproducible by filtering rows through it. A band drawn 17 wide that lists 19
+students underneath would only surface mid-demo.
+
+Still not building, unchanged: attached institutional programmes with owners; per-tile faculty
+comparison rows; a separate Pressure tab; contribution supply/demand.

@@ -21,6 +21,8 @@ import { dynOf, extraWaves, facetsOf, k7s, kband, MAG_LEGEND, waveSeries } from 
 export interface Read {
   key: string
   name: string
+  /** Column header in the roster, where the full name will not fit. */
+  short: string
   /** Plain-language gloss, used where a tile has no facet list to show. */
   blurb: string
   /** null marks the pressure read, which is a swing magnitude, not a score. */
@@ -31,6 +33,7 @@ export const READS: readonly Read[] = [
   {
     key: 'lead',
     name: 'Leadership potential',
+    short: 'LEADERSHIP',
     blurb: 'Taking charge, carrying other people, and finishing what was started.',
     facets: [
       ['e', 'Lead & Take Charge'],
@@ -41,6 +44,7 @@ export const READS: readonly Read[] = [
   {
     key: 'team',
     name: 'Team compatibility & dynamics',
+    short: 'TEAM',
     blurb: 'How readily a student works through other people rather than around them.',
     facets: [
       ['so', 'Collaboration & Teamwork'],
@@ -51,6 +55,7 @@ export const READS: readonly Read[] = [
   {
     key: 'resil',
     name: 'Emotional resilience',
+    short: 'RESILIENCE',
     blurb: 'Holding steady when the work gets hard and the ground moves.',
     facets: [
       ['e', 'Persistence & Mental Toughness'],
@@ -61,6 +66,7 @@ export const READS: readonly Read[] = [
   {
     key: 'work',
     name: 'Workplace readiness',
+    short: 'WORKPLACE',
     blurb: 'Delivering to a standard, on a deadline, with the reasoning shown.',
     facets: [
       ['sa', 'Achievement & Results'],
@@ -71,6 +77,7 @@ export const READS: readonly Read[] = [
   {
     key: 'press',
     name: 'Behaviour under pressure',
+    short: 'SWING',
     blurb: 'The widest shift a student shows when a situation stops being controlled.',
     facets: null,
   },
@@ -160,6 +167,26 @@ export const SWING_BANDS = [
 
 export const NOT_MEASURABLE = 'NOT YET MEASURABLE'
 
+/**
+ * Which band one student falls in for one read.
+ *
+ * The single cut. `tally` counts through it and the roster filters through it,
+ * so a band holding 17 students in the bar cannot list 19 underneath — the
+ * failure this codebase is otherwise built to prevent.
+ */
+export function bandOf(row: ReadinessRow, key: string): string {
+  if (key === 'press') return SWING_BANDS.find((b) => row.swing >= b.lo && row.swing < b.hi)!.name
+  return kband(row.scores[key]).t
+}
+
+/** The colour that band is drawn in, so a roster cell matches the bar above it. */
+export function bandColorOf(row: ReadinessRow, key: string): string {
+  const name = bandOf(row, key)
+  return key === 'press'
+    ? SWING_BANDS.find((b) => b.name === name)!.color
+    : MAG_LEGEND.find((b) => b.t === name)!.c
+}
+
 export interface BandShare {
   name: string
   color: string
@@ -198,7 +225,7 @@ export function tally(rows: ReadinessRow[]): TileView[] {
   return READS.map((r): TileView => {
     if (r.facets) {
       const vals = rows.map((x) => x.scores[r.key])
-      const counts = MAG_LEGEND.map((b) => vals.filter((v) => kband(v).t === b.t).length)
+      const counts = MAG_LEGEND.map((b) => rows.filter((x) => bandOf(x, r.key) === b.t).length)
       const pct = n ? waffleCells(counts, n) : counts.map(() => 0)
       const below = counts[0] + counts[1]
       return {
@@ -217,7 +244,7 @@ export function tally(rows: ReadinessRow[]): TileView[] {
     }
 
     const sw = rows.map((x) => x.swing).sort((a, b) => a - b)
-    const counts = SWING_BANDS.map((b) => sw.filter((v) => v >= b.lo && v < b.hi).length)
+    const counts = SWING_BANDS.map((b) => rows.filter((x) => bandOf(x, r.key) === b.name).length)
     const pct = n ? waffleCells(counts, n) : counts.map(() => 0)
     const wide = counts[2] + counts[3]
     return {
